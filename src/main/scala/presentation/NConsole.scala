@@ -19,7 +19,7 @@ object SpecialKey extends Enumeration {
   val Up, Down, Left, Right, Esc, Unknown = Value
 }
 
-trait Console[F[_]] {
+trait NConsole[F[_]] {
   def read(): F[Input]
 
   def writeCharacter(c: Char): F[Unit]
@@ -29,14 +29,14 @@ trait Console[F[_]] {
   def clear(): F[Unit]
 }
 
-object Console {
+object NConsole {
   private val terminal = TerminalBuilder.terminal()
   terminal.enterRawMode()
   private val reader = terminal.reader()
 
-  def make[F[_] : Sync]()(implicit M: Monad[F]): F[Console[F]] = {
+  def make[F[_] : Sync]()(implicit M: Monad[F]): F[NConsole[F]] = {
     Sync[F].delay(
-      new Console[F] {
+      new NConsole[F] {
         override def read(): F[Input] = M.pure {
           var input = reader.read().toChar
           if (input == 27) {

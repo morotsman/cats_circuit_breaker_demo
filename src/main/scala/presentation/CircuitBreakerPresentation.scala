@@ -7,7 +7,7 @@ object CircuitBreakerPresentation extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
     (for {
-      console <- Console.make[IO]()
+      console <- NConsole.make[IO]()
       presentation <- Ref[IO]
         .of(PresentationState(0, List(
           Start[IO](console),
@@ -24,7 +24,7 @@ object CircuitBreakerPresentation extends IOApp {
 
   case class CurrentSlide(fiber: FiberIO[Unit])
 
-  def handleInput(c: Console[IO], presentation: Presentation[IO], ref: Ref[IO, CurrentSlide]): IO[Input] = for {
+  def handleInput(c: NConsole[IO], presentation: Presentation[IO], ref: Ref[IO, CurrentSlide]): IO[Input] = for {
     input <- c.read()
     state <- ref.get
     _ <- input match {

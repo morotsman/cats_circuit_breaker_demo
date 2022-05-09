@@ -7,7 +7,9 @@ import cats.implicits._
 
 import scala.concurrent.duration.DurationInt
 
-case class CircuitBreakerDemo[F[_] : FlatMap : Temporal](console: Console[F]) extends Slide[F] {
+case class CircuitBreakerDemo[F[_] : FlatMap : Temporal](
+                                                          console: NConsole[F]
+                                                        ) extends Slide[F] {
   val test = 1000
 
   val closedFailedUnderThresholdAnimation = List(
@@ -39,7 +41,7 @@ case class CircuitBreakerDemo[F[_] : FlatMap : Temporal](console: Console[F]) ex
       |  Failure threshold: (a +/-)                            | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
       |  Reset timeout: (r +/-)                                | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
       |  Max reset timeout: (m +/-)                            | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
-      |                                                        |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
+      |  Start/Stop: (s)                                       |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
       |                                                               Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
       |                                                                                      | |  |_||_/_/ \_\____|_|    \___/|_| |___|_|\_|   | |
       |                                                                                      |_|_ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ _|_|

@@ -8,7 +8,7 @@ trait Slide[F[_]] {
   def userInput(input: Input): F[Unit]
 }
 
-case class Start[F[_] : Sync](console: Console[F]) extends Slide[F] {
+case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
   override def show(): F[Unit] = {
     val text =
       """
@@ -38,7 +38,7 @@ case class Start[F[_] : Sync](console: Console[F]) extends Slide[F] {
   override def userInput(input: Input): F[Unit] = Sync[F].unit
 }
 
-case class Agenda[F[_] : Sync](console: Console[F]) extends Slide[F] {
+case class Agenda[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
   override def show(): F[Unit] =
     console.writeString("""
                           |                               _
@@ -76,7 +76,7 @@ case class Agenda[F[_] : Sync](console: Console[F]) extends Slide[F] {
   override def userInput(input: Input): F[Unit] = Sync[F].unit
 }
 
-case class StaticViewCircuitBreaker[F[_] : Sync](console: Console[F]) extends Slide[F] {
+case class StaticViewCircuitBreaker[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
   override def show(): F[Unit] = {
     val stateMachine =
       """

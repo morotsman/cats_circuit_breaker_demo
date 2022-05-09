@@ -23,7 +23,7 @@ final case class PresentationState[F[_]](
 
 object Presentation {
   def make[F[_] : Sync](
-                         console: Console[F],
+                         console: NConsole[F],
                          state: Ref[F, PresentationState[F]]
                        ): F[Presentation[F]] = Sync[F].delay(
     new Presentation[F] {
