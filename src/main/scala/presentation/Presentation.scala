@@ -59,7 +59,9 @@ object Presentation {
 
       override def exit(): F[Unit] = ???
 
-      override def userInput(input: Input): F[Unit] = Sync[F].unit
+      override def userInput(input: Input): F[Unit] = for {
+        _ <- state.get
+      } yield ()
     }
   )
 }

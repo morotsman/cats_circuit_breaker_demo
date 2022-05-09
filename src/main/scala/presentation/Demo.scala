@@ -1,14 +1,14 @@
 package com.github.morotsman
 package presentation
 
-import cats.FlatMap
+import cats.{FlatMap, Monad}
 import cats.effect.Temporal
 import cats.implicits._
 
 import scala.annotation.tailrec
 import scala.concurrent.duration.DurationInt
 
-case class CircuitBreakerDemo[F[_] : FlatMap: Temporal](console: Console[F]) extends Slide[F] {
+case class CircuitBreakerDemo[F[_] : Monad: Temporal](console: Console[F]) extends Slide[F] {
   override def show(): F[Unit] = {
 
     val animation = List(
@@ -528,6 +528,8 @@ case class CircuitBreakerDemo[F[_] : FlatMap: Temporal](console: Console[F]) ext
 
     animate(0)
   }
+
+  override def userInput(input: Input): F[Unit] = Monad[F].unit
 }
 
 

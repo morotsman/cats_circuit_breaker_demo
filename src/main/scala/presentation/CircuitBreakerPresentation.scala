@@ -3,8 +3,6 @@ package presentation
 
 import cats.effect._
 
-import scala.concurrent.duration.DurationInt
-
 object CircuitBreakerPresentation extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {

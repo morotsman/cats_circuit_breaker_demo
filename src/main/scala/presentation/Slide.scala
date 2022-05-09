@@ -1,18 +1,14 @@
 package com.github.morotsman
 package presentation
 
-import cats.FlatMap
-import cats.effect.Temporal
-import cats.implicits._
-
-import scala.annotation.tailrec
-import scala.concurrent.duration.DurationInt
+import cats.effect.Sync
 
 trait Slide[F[_]] {
   def show(): F[Unit]
+  def userInput(input: Input): F[Unit]
 }
 
-case class Start[F[_] : FlatMap](console: Console[F]) extends Slide[F] {
+case class Start[F[_] : Sync](console: Console[F]) extends Slide[F] {
   override def show(): F[Unit] = {
     val text =
       """
@@ -38,9 +34,11 @@ case class Start[F[_] : FlatMap](console: Console[F]) extends Slide[F] {
         |"""
     console.writeString(text.stripMargin)
   }
+
+  override def userInput(input: Input): F[Unit] = Sync[F].unit
 }
 
-case class Agenda[F[_] : FlatMap](console: Console[F]) extends Slide[F] {
+case class Agenda[F[_] : Sync](console: Console[F]) extends Slide[F] {
   override def show(): F[Unit] =
     console.writeString("""
                           |                               _
@@ -74,9 +72,11 @@ case class Agenda[F[_] : FlatMap](console: Console[F]) extends Slide[F] {
                           |
                           |
                           |""".stripMargin)
+
+  override def userInput(input: Input): F[Unit] = Sync[F].unit
 }
 
-case class StaticViewCircuitBreaker[F[_] : FlatMap](console: Console[F]) extends Slide[F] {
+case class StaticViewCircuitBreaker[F[_] : Sync](console: Console[F]) extends Slide[F] {
   override def show(): F[Unit] = {
     val stateMachine =
       """
@@ -117,4 +117,6 @@ case class StaticViewCircuitBreaker[F[_] : FlatMap](console: Console[F]) extends
         |""".stripMargin
     console.writeString(stateMachine)
   }
+
+  override def userInput(input: Input): F[Unit] = Sync[F].unit
 }
