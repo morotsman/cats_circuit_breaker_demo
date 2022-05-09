@@ -8,7 +8,7 @@ import cats.implicits._
 import scala.annotation.tailrec
 import scala.concurrent.duration.DurationInt
 
-case class CircuitBreakerDemo[F[_] : Monad: Temporal](console: Console[F]) extends Slide[F] {
+case class CircuitBreakerDemo[F[_] : Monad : Temporal](console: Console[F]) extends Slide[F] {
   override def show(): F[Unit] = {
 
     val animation = List(
@@ -529,7 +529,9 @@ case class CircuitBreakerDemo[F[_] : Monad: Temporal](console: Console[F]) exten
     animate(0)
   }
 
-  override def userInput(input: Input): F[Unit] = Monad[F].unit
+  override def userInput(input: Input): F[Unit] = for {
+    _ <- console.writeString("user input: " + input)
+  } yield ()
 }
 
 

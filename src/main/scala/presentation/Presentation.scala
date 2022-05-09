@@ -60,7 +60,9 @@ object Presentation {
       override def exit(): F[Unit] = ???
 
       override def userInput(input: Input): F[Unit] = for {
-        _ <- state.get
+        presentationState <- state.get
+        slide = presentationState.slides(presentationState.slideIndex)
+        _ <- slide.userInput(input)
       } yield ()
     }
   )
