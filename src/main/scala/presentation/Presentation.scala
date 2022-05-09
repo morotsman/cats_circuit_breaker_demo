@@ -12,6 +12,8 @@ trait Presentation[F[_]] {
   def previousSlide(): F[Unit]
 
   def exit(): F[Unit]
+
+  def userInput(input: Input): F[Unit]
 }
 
 final case class PresentationState[F[_]](
@@ -57,7 +59,7 @@ object Presentation {
 
       override def exit(): F[Unit] = ???
 
-
+      override def userInput(input: Input): F[Unit] = Sync[F].unit
     }
   )
 }
