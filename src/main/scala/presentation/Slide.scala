@@ -99,7 +99,7 @@ case class StaticViewCircuitBreaker[F[_] : Sync](console: Console[F]) extends Sl
         |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
         |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
         |        \_\                                             | |                                         | |                     | |
-        |           fail (under treshold)                        | |                                         |_|                     |_|
+        |           fail (under threshold)                       | |                                         |_|                     |_|
         |                                                        | |                                         | |                     | |
         |                                                        | |                                         | |                     | |
         |                                                        | |                                         | |                    \|_|/

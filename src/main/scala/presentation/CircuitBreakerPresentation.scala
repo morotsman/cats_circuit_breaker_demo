@@ -43,7 +43,10 @@ object CircuitBreakerPresentation extends IOApp {
           f <- state.fiber.cancel >> presentation.exit().start
           _ <- ref.set(CurrentSlide(f))
         } yield ()
-      case _ => presentation.userInput(input).start
+      case _ => for {
+        f <- state.fiber.cancel >> presentation.userInput(input).start
+        _ <- ref.set(CurrentSlide(f))
+      } yield ()
     }
   } yield input
 
