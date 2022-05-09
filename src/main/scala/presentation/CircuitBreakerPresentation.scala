@@ -12,10 +12,10 @@ object CircuitBreakerPresentation extends IOApp {
       console <- Console.make[IO]()
       presentation <- Ref[IO]
         .of(PresentationState(0, List(
-          Slide1[IO](console),
-          Slide2[IO](console),
-          Slide3[IO](console),
-          Slide4[IO](console)
+          Start[IO](console),
+          Agenda[IO](console),
+          StaticViewCircuitBreaker[IO](console),
+          CircuitBreakerDemo[IO](console)
         )))
         .flatMap(Presentation.make[IO](console, _))
       firstSlide <- presentation.start().start
