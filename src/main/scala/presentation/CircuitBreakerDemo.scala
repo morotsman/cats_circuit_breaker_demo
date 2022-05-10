@@ -1,54 +1,64 @@
 package com.github.morotsman
 package presentation
 
-import cats.FlatMap
+import cats.{FlatMap, Monad}
 import cats.effect.Temporal
 import cats.implicits._
+import com.github.morotsman.presentation.demo.{DemoProgram, SourceOfMayhem, Statistics}
 
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-case class CircuitBreakerDemo[F[_] : FlatMap : Temporal](
-                                                          console: NConsole[F]
+final case class DemoConfiguration(
+                                    maxFailures: Int,
+                                    resetTimeout: FiniteDuration,
+                                    maxResetTimeout: FiniteDuration
+                                  )
+
+case class CircuitBreakerDemo[F[_] : Monad : Temporal](
+                                                          console: NConsole[F],
+                                                          demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
+                                                          sourceOfMayhem: SourceOfMayhem[F],
+                                                          statistics: Statistics[F]
                                                         ) extends Slide[F] {
   val test = 1000
 
   val closedFailedUnderThresholdAnimation = List(
     raw"""
-      |           __   Success                                 Status: CLOSED                                    __  call / raise circuit open
-      |        _ / /__ ___ ___ ___ ___ _                       Circuit breaker called:                        _ / /__ ___ ___ ___ ___ _
-      |       | < <___|___|___|___|___| |                      Request per second:                           | < <___|___|___|___|___| |
-      |       | |\_\                  | |                      Pending requests:                             | |\_\                  | |
-      |       | |                     | |                                                                    | |                     | |
-      |       | |                     | |                                                                    | |                     | |
-      |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
-      | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
-      | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
-      | | |    / __| |  / _ \/ __| __|   \    | |     __                                          /_/  | |        / _ \| _ \ __| \| |        | |
-      | | |   | (__| |_| (_) \__ \ _|| |) |   | |    / /___ ___ _                                      | |       | (_) |  _/ _|| .` |        | |
-      | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
-      | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
-      | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
-      |     | |                     | |                        | |
-      |     | | __                  | |                        | |                                         / \                 reset timeout
-      |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
-      |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
-      |        \_\                                             | |                                         | |                     | |
-      |           fail (under threshold)                       | |                                         |_|                     |_|
-      |                                                        | |                                         | |                     | |
-      |  Toggle fail: failing (f)                              | |                                         | |                     | |
-      |  Success latency: $test (s +/-)                        | |                                         | |                    \|_|/
-      |  Timeout: (t +/-)                                      | |                                        fail                     \ /
-      |  Failure threshold: (a +/-)                            | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
-      |  Reset timeout: (r +/-)                                | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
-      |  Max reset timeout: (m +/-)                            | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
-      |  Start/Stop: (s)                                       |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
-      |                                                               Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
-      |                                                                                      | |  |_||_/_/ \_\____|_|    \___/|_| |___|_|\_|   | |
-      |                                                                                      |_|_ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
-      |                                                                                      |___|___|___|___|___|___|___|___|___|___|___|___|___|
-      |
-      |
-      |""".stripMargin,
+         |           __   Success                                 Status: CLOSED                                    __  call / raise circuit open
+         |        _ / /__ ___ ___ ___ ___ _                       Circuit breaker called:                        _ / /__ ___ ___ ___ ___ _
+         |       | < <___|___|___|___|___| |                      Request per second:                           | < <___|___|___|___|___| |
+         |       | |\_\                  | |                      Pending requests:                             | |\_\                  | |
+         |       | |                     | |                                                                    | |                     | |
+         |       | |                     | |                                                                    | |                     | |
+         |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
+         | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
+         | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
+         | | |    / __| |  / _ \/ __| __|   \    | |     __                                          /_/  | |        / _ \| _ \ __| \| |        | |
+         | | |   | (__| |_| (_) \__ \ _|| |) |   | |    / /___ ___ _                                      | |       | (_) |  _/ _|| .` |        | |
+         | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
+         | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
+         | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
+         |     | |                     | |                        | |
+         |     | | __                  | |                        | |                                         / \                 reset timeout
+         |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
+         |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
+         |        \_\                                             | |                                         | |                     | |
+         |           fail (under threshold)                       | |                                         |_|                     |_|
+         |                                                        | |                                         | |                     | |
+         |  Toggle fail: f                                        | |                                         | |                     | |
+         |  Success latency: s +/-                                | |                                         | |                    \|_|/
+         |  Timeout: t +/-                                        | |                                        fail                     \ /
+         |  Failure threshold: a +/-                              | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
+         |  Reset timeout: r +/-                                  | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
+         |  Max reset timeout: m +/-                              | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
+         |  Start/Stop: s                                         |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
+         |                                                               Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
+         |                                                                                      | |  |_||_/_/ \_\____|_|    \___/|_| |___|_|\_|   | |
+         |                                                                                      |_|_ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
+         |                                                                                      |___|___|___|___|___|___|___|___|___|___|___|___|___|
+         |
+         |
+         |""".stripMargin,
     """
       |           __   Success                                                                                   __  call / raise circuit open
       |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
@@ -167,10 +177,28 @@ case class CircuitBreakerDemo[F[_] : FlatMap : Temporal](
     animate(animation = closedSuccessAnimation)
   }
 
-  override def userInput(input: Input): F[Unit] = for {
+  override def userInput(input: Input): F[Boolean] = for {
     _ <- console.clear()
-    _ <- animate(animation = closedFailedUnderThresholdAnimation)
-  } yield ()
+    result <- input match {
+      case Character(c) if c == 'f' =>
+        animate(animation = closedFailedUnderThresholdAnimation).map(_ => true)
+      case Character(c) if c == 's' =>
+        for {
+          demoProgram <- demoProgramFactory(
+            DemoConfiguration(
+              maxFailures = 5,
+              resetTimeout = 3.seconds,
+              maxResetTimeout = 30.seconds
+            ), sourceOfMayhem, statistics
+          )
+          _ <- demoProgram.run()
+          info <- statistics.getStatisticsInfo()
+          _ <- Temporal[F].sleep(5.seconds) >> console.writeString("statistics: " + info)
+        } yield true
+      case _ =>
+        Monad[F].pure(false)
+    }
+  } yield result
 
   private def animate(frame: Int = 0, animation: List[String]): F[Unit] = for {
     _ <- console.writeString(animation(frame))
