@@ -5,7 +5,7 @@ import cats.effect.Sync
 
 trait Slide[F[_]] {
   def show(): F[Unit]
-  def userInput(input: Input): F[Boolean]
+  def userInput(input: Input): F[Unit]
 }
 
 case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
@@ -35,7 +35,7 @@ case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
     console.writeString(text.stripMargin)
   }
 
-  override def userInput(input: Input): F[Boolean] = Sync[F].pure(false)
+  override def userInput(input: Input): F[Unit] = Sync[F].unit
 }
 
 case class Agenda[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
@@ -73,7 +73,7 @@ case class Agenda[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
                           |
                           |""".stripMargin)
 
-  override def userInput(input: Input): F[Boolean] = Sync[F].pure(false)
+  override def userInput(input: Input): F[Unit] = Sync[F].unit
 }
 
 case class StaticViewCircuitBreaker[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
@@ -118,5 +118,5 @@ case class StaticViewCircuitBreaker[F[_] : Sync](console: NConsole[F]) extends S
     console.writeString(stateMachine)
   }
 
-  override def userInput(input: Input): F[Boolean] = Sync[F].pure(false)
+  override def userInput(input: Input): F[Unit] = Sync[F].unit
 }

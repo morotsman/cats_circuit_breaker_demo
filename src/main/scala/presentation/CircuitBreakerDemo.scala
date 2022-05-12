@@ -178,9 +178,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
     animate(animation = closedSuccessAnimation)
   }
 
-  override def userInput(input: Input): F[Boolean] = for {
+  override def userInput(input: Input): F[Unit] = for {
     _ <- console.clear()
-    result <- input match {
+    _ <- input match {
       case Character(c) if c == 'f' =>
         animate(animation = closedFailedUnderThresholdAnimation).map(_ => true)
       case Character(c) if c == 's' =>
@@ -203,11 +203,11 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
               } yield ()
             }
             ).parTupled
-        } yield true
+        } yield ()
       case _ =>
-        Monad[F].pure(false)
+        Monad[F].unit
     }
-  } yield result
+  } yield ()
 
   private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
     Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
