@@ -1,9 +1,10 @@
 package com.github.morotsman
-package presentation
+package presentation.tools
 
-import cats.effect.Sync
+import presentation.tools.SpecialKey.SpecialKey
+
 import cats.Monad
-import com.github.morotsman.presentation.SpecialKey.{SpecialKey, Unknown, Up}
+import cats.effect.Sync
 import org.jline.terminal.TerminalBuilder
 import org.jline.utils.InfoCmp.Capability
 

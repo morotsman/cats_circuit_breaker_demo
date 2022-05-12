@@ -1,5 +1,5 @@
 package com.github.morotsman
-package presentation
+package presentation.util
 
 object Colors {
   val ANSI_RESET = "\u001B[0m"

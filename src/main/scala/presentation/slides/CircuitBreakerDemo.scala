@@ -8,6 +8,8 @@ import cats._
 import cats.effect._
 import cats.effect.implicits._
 import cats.implicits._
+import com.github.morotsman.presentation.tools.{Character, Input, NConsole, Slide}
+import com.github.morotsman.presentation.util.Colors
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 

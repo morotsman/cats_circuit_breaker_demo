@@ -1,9 +1,8 @@
 package com.github.morotsman
 package presentation.slides
 
-import presentation.{Input, NConsole, Slide}
-
 import cats.effect.Sync
+import com.github.morotsman.presentation.tools.{Input, NConsole, Slide}
 
 case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
   override def show(): F[Unit] = {
