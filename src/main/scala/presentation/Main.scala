@@ -4,7 +4,7 @@ package presentation
 import cats.effect._
 import com.github.morotsman.presentation.demo.CircuitBreakerState.CircuitBreakerState
 import com.github.morotsman.presentation.demo.{CircuitBreakerState, DemoProgram, MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
-import com.github.morotsman.presentation.slides.demo_slide.{CircuitBreakerDemo, DemoConfiguration}
+import com.github.morotsman.presentation.slides.demo_slide.{CircuitBreakerDemo, CircuitBreakerDemoState, DemoConfiguration}
 import com.github.morotsman.presentation.slides.{Agenda, Start}
 import com.github.morotsman.presentation.tools.{Input, NConsole, Presentation, PresentationState}
 import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
@@ -17,16 +17,18 @@ object Main extends IOApp {
     (for {
       console <- NConsole.make[IO]()
       (sourceOfMayhem, statistics) <- setupDemoApp()
+      circuitBreakerDemoSlide <- Ref[IO].of(CircuitBreakerDemoState()).map(CircuitBreakerDemo[IO](
+        console = console,
+        demoProgramFactory = createDemoApp,
+        sourceOfMayhem = sourceOfMayhem,
+        statistics = statistics,
+        _
+      ))
       presentation <- Ref[IO]
         .of(PresentationState.initialState(List(
           Start[IO](console),
           Agenda[IO](console),
-          CircuitBreakerDemo[IO](
-            console = console,
-            demoProgramFactory = createDemoApp,
-            sourceOfMayhem = sourceOfMayhem,
-            statistics = statistics
-          )
+          circuitBreakerDemoSlide
         )))
         .flatMap(Presentation.make[IO](console, _))
       _ <- presentation.start().start

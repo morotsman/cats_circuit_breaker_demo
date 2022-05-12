@@ -13,6 +13,10 @@ import presentation.tools.{Character, Input, NConsole, Slide}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
+final case class CircuitBreakerDemoState(
+
+                                        )
+
 final case class DemoConfiguration(
                                     maxFailures: Int,
                                     resetTimeout: FiniteDuration,
@@ -23,11 +27,28 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
                                                                 console: NConsole[F],
                                                                 demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
                                                                 sourceOfMayhem: SourceOfMayhem[F],
-                                                                statistics: Statistics[F]
+                                                                statistics: Statistics[F],
+                                                                state: Ref[F, CircuitBreakerDemoState]
                                                               ) extends Slide[F] {
 
   override def show(): F[Unit] = {
+    val tmp = forever(1.seconds) {
+      for {
+        info <- statistics.getStatisticsInfo()
+        _ <- console.writeString("statistics: " + info)
+      } yield ()
+    }
+
+
+
     animate(animation = closedSuccessAnimation)
+  }
+
+  private def showStatistics(): F[Unit] = forever(1.seconds) {
+    for {
+      info <- statistics.getStatisticsInfo()
+      _ <- console.writeString("statistics: " + info)
+    } yield ()
   }
 
   override def userInput(input: Input): F[Boolean] = for {
