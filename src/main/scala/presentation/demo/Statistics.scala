@@ -33,7 +33,10 @@ object Statistics {
 
   def make[F[_]](ref: Ref[F, StatisticsInfo]): Statistics[F] = new Statistics[F] {
     override def requestSent(): F[Unit] =
-      ref.modify(s => (s.copy(pendingRequests = s.pendingRequests + 1), s))
+      ref.modify(s => (s.copy(
+        pendingRequests = s.pendingRequests + 1,
+        sentSinceLastReport = s.sentSinceLastReport + 1
+      ), s))
 
     override def requestCompleted(): F[Unit] =
       ref.modify(s => (s.copy(pendingRequests = s.pendingRequests - 1), s))

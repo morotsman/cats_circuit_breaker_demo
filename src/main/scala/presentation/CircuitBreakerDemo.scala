@@ -1,9 +1,10 @@
 package com.github.morotsman
 package presentation
 
-import cats.{FlatMap, Monad}
-import cats.effect.Temporal
+import cats._
+import cats.effect._
 import cats.implicits._
+import cats.effect.implicits._
 import com.github.morotsman.presentation.demo.{DemoProgram, SourceOfMayhem, Statistics}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -14,12 +15,12 @@ final case class DemoConfiguration(
                                     maxResetTimeout: FiniteDuration
                                   )
 
-case class CircuitBreakerDemo[F[_] : Monad : Temporal](
-                                                          console: NConsole[F],
-                                                          demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
-                                                          sourceOfMayhem: SourceOfMayhem[F],
-                                                          statistics: Statistics[F]
-                                                        ) extends Slide[F] {
+case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
+                                                        console: NConsole[F],
+                                                        demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
+                                                        sourceOfMayhem: SourceOfMayhem[F],
+                                                        statistics: Statistics[F]
+                                                      ) extends Slide[F] {
   val test = 1000
 
   val closedFailedUnderThresholdAnimation = List(
@@ -191,21 +192,33 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal](
               maxResetTimeout = 30.seconds
             ), sourceOfMayhem, statistics
           )
-          _ <- demoProgram.run()
-          info <- statistics.getStatisticsInfo()
-          _ <- Temporal[F].sleep(5.seconds) >> console.writeString("statistics: " + info)
+          _ <- (
+            forever(5.micros) {
+              //console.writeString("hepp")
+              demoProgram.run().start
+            },
+            forever(1.seconds) {
+              for {
+                info <- statistics.getStatisticsInfo()
+                _ <- console.writeString("statistics: " + info)
+              } yield ()
+            }
+          ).parTupled
         } yield true
       case _ =>
         Monad[F].pure(false)
     }
   } yield result
 
-  private def animate(frame: Int = 0, animation: List[String]): F[Unit] = for {
-    _ <- console.writeString(animation(frame))
-    _ <- Temporal[F].sleep(500.milli)
-    _ <- console.clear()
-    _ <- animate(if (frame < animation.size - 1) frame + 1 else 0, animation)
-  } yield ()
+  private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
+    Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
+
+  private def animate(frame: Int = 0, animation: List[String]): F[Unit] =
+    console.writeString(animation(frame)) >>
+      Temporal[F].sleep(500.milli) >>
+      console.clear() >>
+      animate(if (frame < animation.size - 1) frame + 1 else 0, animation)
+
 }
 
 
