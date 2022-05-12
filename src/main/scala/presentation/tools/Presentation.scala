@@ -9,19 +9,19 @@ import cats.implicits._
 trait Presentation[F[_]] {
   def start(): F[Unit]
 
-  def nextSlide(): F[Unit]
+  def nextSlide(): F[Boolean]
 
-  def previousSlide(): F[Unit]
+  def previousSlide(): F[Boolean]
 
-  def exit(): F[Unit]
+  def exit(): F[Boolean]
 
-  def userInput(input: Input): F[Unit]
+  def userInput(input: Input): F[Boolean]
 }
 
 final case class PresentationState[F[_]](
                                           slideIndex: Int,
                                           slides: List[Slide[F]],
-                                          ongoingWork: Option[Fiber[F, Throwable, Unit]]
+                                          ongoingWork: Option[Fiber[F, Throwable, Boolean]]
                                         )
 
 object PresentationState {
@@ -41,7 +41,7 @@ object Presentation {
         _ <- state.slides.head.show()
       } yield ()
 
-      override def nextSlide(): F[Unit] = for {
+      override def nextSlide(): F[Boolean] = for {
         _ <- console.clear()
         state <- state.updateAndGet(s =>
           if (s.slideIndex == s.slides.size - 1) {
@@ -51,9 +51,9 @@ object Presentation {
           }
         )
         _ <- state.slides(state.slideIndex).show()
-      } yield ()
+      } yield true
 
-      override def previousSlide(): F[Unit] = for {
+      override def previousSlide(): F[Boolean] = for {
         _ <- console.clear()
         state <- state.updateAndGet(s =>
           if (s.slideIndex > 0) {
@@ -63,11 +63,11 @@ object Presentation {
           }
         )
         _ <- state.slides(state.slideIndex).show()
-      } yield ()
+      } yield true
 
-      override def exit(): F[Unit] = ???
+      override def exit(): F[Boolean] = ???
 
-      override def userInput(input: Input): F[Unit] = for {
+      override def userInput(input: Input): F[Boolean] = for {
         presentationState <- state.get
         _ <- input match {
           case Key(k) if k == SpecialKey.Left =>
@@ -100,7 +100,7 @@ object Presentation {
                 ), s))
             } yield ()
         }
-      } yield ()
+      } yield true
 
     }
   )

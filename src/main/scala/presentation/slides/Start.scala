@@ -31,6 +31,6 @@ case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
     console.writeString(text.stripMargin)
   }
 
-  override def userInput(input: Input): F[Unit] = Sync[F].unit
+  override def userInput(input: Input): F[Boolean] = Sync[F].pure(true)
 }
 
