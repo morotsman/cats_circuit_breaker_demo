@@ -1,16 +1,15 @@
 package com.github.morotsman
 package presentation.slides.demo_slide
 
-import presentation.demo.{DemoProgram, SourceOfMayhem, Statistics}
-import presentation.tools.{Character, Input, NConsole, Slide}
-import presentation.util.Colors
-
 import cats._
 import cats.effect._
 import cats.effect.implicits._
 import cats.implicits._
-import com.github.morotsman.presentation.slides.demo_slide.animations.ClosedFailedUnderThreshold.closedFailedUnderThresholdAnimation
-import com.github.morotsman.presentation.slides.demo_slide.animations.ClosedSuccess.closedSuccessAnimation
+import presentation.slides.demo_slide.animations.ClosedFailedUnderThreshold.closedFailedUnderThresholdAnimation
+import presentation.slides.demo_slide.animations.ClosedSuccess.closedSuccessAnimation
+import presentation.demo.{DemoProgram, SourceOfMayhem, Statistics}
+import presentation.tools.{Character, Input, NConsole, Slide}
+
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
