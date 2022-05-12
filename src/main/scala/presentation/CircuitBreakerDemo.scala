@@ -16,11 +16,11 @@ final case class DemoConfiguration(
                                   )
 
 case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
-                                                        console: NConsole[F],
-                                                        demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
-                                                        sourceOfMayhem: SourceOfMayhem[F],
-                                                        statistics: Statistics[F]
-                                                      ) extends Slide[F] {
+                                                                console: NConsole[F],
+                                                                demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
+                                                                sourceOfMayhem: SourceOfMayhem[F],
+                                                                statistics: Statistics[F]
+                                                              ) extends Slide[F] {
   val test = 1000
 
   val closedFailedUnderThresholdAnimation = List(
@@ -194,7 +194,6 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
           )
           _ <- (
             forever(5.micros) {
-              //console.writeString("hepp")
               demoProgram.run().start
             },
             forever(1.seconds) {
@@ -203,7 +202,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
                 _ <- console.writeString("statistics: " + info)
               } yield ()
             }
-          ).parTupled
+            ).parTupled
         } yield true
       case _ =>
         Monad[F].pure(false)
