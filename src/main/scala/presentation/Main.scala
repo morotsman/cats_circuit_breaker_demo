@@ -4,11 +4,12 @@ package presentation
 import cats.effect._
 import com.github.morotsman.presentation.demo.CircuitBreakerState.CircuitBreakerState
 import com.github.morotsman.presentation.demo.{CircuitBreakerState, DemoProgram, MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
+import com.github.morotsman.presentation.slides.{Agenda, CircuitBreakerDemo, DemoConfiguration, Start}
 import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
 
 import scala.concurrent.duration._
 
-object CircuitBreakerPresentation extends IOApp {
+object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
     (for {
@@ -18,7 +19,6 @@ object CircuitBreakerPresentation extends IOApp {
         .of(PresentationState.initialState(List(
           Start[IO](console),
           Agenda[IO](console),
-          StaticViewCircuitBreaker[IO](console),
           CircuitBreakerDemo[IO](
             console = console,
             demoProgramFactory = createDemoApp,
