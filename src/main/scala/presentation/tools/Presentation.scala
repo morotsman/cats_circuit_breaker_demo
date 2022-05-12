@@ -7,21 +7,21 @@ import cats.effect.implicits._
 import cats.implicits._
 
 trait Presentation[F[_]] {
-  def start(): F[Unit]
+  def start(): F[Fiber[F, Throwable, Unit]]
 
-  def nextSlide(): F[Boolean]
+  def nextSlide(): F[Fiber[F, Throwable, Unit]]
 
-  def previousSlide(): F[Boolean]
+  def previousSlide(): F[Fiber[F, Throwable, Unit]]
 
-  def exit(): F[Boolean]
+  def exit(): F[Fiber[F, Throwable, Unit]]
 
-  def userInput(input: Input): F[Boolean]
+  def userInput(input: Input): F[Fiber[F, Throwable, Unit]]
 }
 
 final case class PresentationState[F[_]](
                                           slideIndex: Int,
                                           slides: List[Slide[F]],
-                                          ongoingWork: Option[Fiber[F, Throwable, Boolean]]
+                                          ongoingWork: Option[Fiber[F, Throwable, Unit]]
                                         )
 
 object PresentationState {
@@ -35,13 +35,13 @@ object Presentation {
                          state: Ref[F, PresentationState[F]]
                        ): F[Presentation[F]] = Monad[F].pure(
     new Presentation[F] {
-      override def start(): F[Unit] = for {
+      override def start(): F[Fiber[F, Throwable, Unit]] = for {
         _ <- console.clear()
         state <- state.get
-        _ <- state.slides.head.show()
-      } yield ()
+        f <- state.slides.head.show()
+      } yield f
 
-      override def nextSlide(): F[Boolean] = for {
+      override def nextSlide(): F[Fiber[F, Throwable, Unit]]= for {
         _ <- console.clear()
         state <- state.updateAndGet(s =>
           if (s.slideIndex == s.slides.size - 1) {
@@ -50,10 +50,10 @@ object Presentation {
             s.copy(slideIndex = s.slideIndex + 1)
           }
         )
-        _ <- state.slides(state.slideIndex).show()
-      } yield true
+        f <- state.slides(state.slideIndex).show()
+      } yield f
 
-      override def previousSlide(): F[Boolean] = for {
+      override def previousSlide(): F[Fiber[F, Throwable, Unit]] = for {
         _ <- console.clear()
         state <- state.updateAndGet(s =>
           if (s.slideIndex > 0) {
@@ -62,32 +62,32 @@ object Presentation {
             s
           }
         )
-        _ <- state.slides(state.slideIndex).show()
-      } yield true
+        f <- state.slides(state.slideIndex).show()
+      } yield f
 
-      override def exit(): F[Boolean] = ???
+      override def exit(): F[Fiber[F, Throwable, Unit]] = ???
 
-      override def userInput(input: Input): F[Boolean] = for {
+      override def userInput(input: Input): F[Fiber[F, Throwable, Unit]] = for {
         presentationState <- state.get
-        _ <- input match {
+        f <- input match {
           case Key(k) if k == SpecialKey.Left =>
             for {
               _ <- presentationState.ongoingWork.traverse(_.cancel)
-              f <- previousSlide().start
+              f <- previousSlide()
               _ <- state.modify(s =>
                   (s.copy(
                     ongoingWork = Option(f)
                   ), s))
-            } yield ()
+            } yield f
           case Key(k) if k == SpecialKey.Right =>
             for {
               _ <- presentationState.ongoingWork.traverse(_.cancel)
-              f <- nextSlide().start
+              f <- nextSlide()
               _ <- state.modify(s =>
                 (s.copy(
                   ongoingWork = Option(f)
                 ), s))
-            } yield ()
+            } yield f
           case _ =>
             for {
               presentationState <- state.get
@@ -98,9 +98,9 @@ object Presentation {
                 (s.copy(
                   ongoingWork = Option(f)
                 ), s))
-            } yield ()
+            } yield f
         }
-      } yield true
+      } yield f
 
     }
   )

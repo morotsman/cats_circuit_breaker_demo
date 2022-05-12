@@ -14,7 +14,6 @@ import presentation.tools.{Character, Input, NConsole, Slide}
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 final case class CircuitBreakerDemoState(
-
                                         )
 
 final case class DemoConfiguration(
@@ -31,8 +30,8 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
                                                                 state: Ref[F, CircuitBreakerDemoState]
                                                               ) extends Slide[F] {
 
-  override def show(): F[Unit] = {
-    val tmp = forever(1.seconds) {
+  override def show(): F[Fiber[F, Throwable, Unit]] = {
+    val tmp: F[Unit] = forever(1.seconds) {
       for {
         info <- statistics.getStatisticsInfo()
         _ <- console.writeString("statistics: " + info)
@@ -41,7 +40,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
 
 
 
-    animate(animation = closedSuccessAnimation)
+    animate(animation = closedSuccessAnimation).start
   }
 
   private def showStatistics(): F[Unit] = forever(1.seconds) {
@@ -51,7 +50,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
     } yield ()
   }
 
-  override def userInput(input: Input): F[Boolean] = for {
+  override def userInput(input: Input): F[Unit] = for {
     _ <- console.clear()
     _ <- input match {
       case Character(c) if c == 'f' =>

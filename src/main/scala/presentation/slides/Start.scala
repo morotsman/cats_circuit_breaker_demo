@@ -1,11 +1,12 @@
 package com.github.morotsman
 package presentation.slides
 
-import cats.effect.Sync
+import cats.effect.implicits._
+import cats.effect.{Fiber, Spawn, Sync}
 import com.github.morotsman.presentation.tools.{Input, NConsole, Slide}
 
-case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
-  override def show(): F[Unit] = {
+case class Start[F[_] : Sync : Spawn](console: NConsole[F]) extends Slide[F] {
+  override def show(): F[Fiber[F, Throwable, Unit]] = {
     val text =
       """
         |
@@ -28,9 +29,9 @@ case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
         |
         |
         |"""
-    console.writeString(text.stripMargin)
+    console.writeString(text.stripMargin).start
   }
 
-  override def userInput(input: Input): F[Boolean] = Sync[F].pure(true)
+  override def userInput(input: Input): F[Unit] = Sync[F].unit
 }
 
