@@ -4,7 +4,7 @@ package presentation
 import cats.effect._
 import com.github.morotsman.presentation.demo.CircuitBreakerState.CircuitBreakerState
 import com.github.morotsman.presentation.demo.{CircuitBreakerState, DemoProgram, MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
-import com.github.morotsman.presentation.slides.demo_slide.{CircuitBreakerDemo, CircuitBreakerDemoState, DemoConfiguration}
+import com.github.morotsman.presentation.slides.demo_slide.{CircuitBreakerDemo, CircuitBreakerDemoState, CircuitBreakerConfiguration}
 import com.github.morotsman.presentation.slides.{Agenda, Start}
 import com.github.morotsman.presentation.tools.{Input, NConsole, Presentation, PresentationState}
 import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
@@ -37,7 +37,7 @@ object Main extends IOApp {
   }
 
   private def createDemoApp(
-                             configuration: DemoConfiguration,
+                             configuration: CircuitBreakerConfiguration,
                              sourceOfMayhem: SourceOfMayhem[IO],
                              statistics: Statistics[IO]
                            ): IO[DemoProgram[IO]] = {

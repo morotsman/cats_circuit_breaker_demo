@@ -12,26 +12,24 @@ import com.github.morotsman.presentation.slides.demo_slide.animations.Static.sta
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-final case class DemoConfiguration(
+final case class CircuitBreakerConfiguration(
                                     maxFailures: Int,
                                     resetTimeout: FiniteDuration,
-                                    maxResetTimeout: FiniteDuration,
-                                    timeBetweenCallToSourceOfMayhem: FiniteDuration
+                                    maxResetTimeout: FiniteDuration
                                   )
 
-object DemoConfiguration {
-  def make():DemoConfiguration =  DemoConfiguration(
+object CircuitBreakerConfiguration {
+  def make():CircuitBreakerConfiguration =  CircuitBreakerConfiguration(
     maxFailures = 5,
     resetTimeout = 3.seconds,
-    maxResetTimeout = 30.seconds,
-    timeBetweenCallToSourceOfMayhem = (1000 * 1000 * 1000).nanos
+    maxResetTimeout = 30.seconds
   )
 }
 
 case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 (
   console: NConsole[F],
-  demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
+  demoProgramFactory: (CircuitBreakerConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
   sourceOfMayhem: SourceOfMayhem[F],
   statistics: Statistics[F],
   state: Ref[F, CircuitBreakerDemoState[F]]
@@ -46,10 +44,10 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
           _ <- state.modify(s => (s.copy(
             statisticsInfo = info
           ), s))
-        } yield ()
+        } yield ()x
       }.start
       demoProgram <- demoProgramFactory(
-        DemoConfiguration.make(),
+        CircuitBreakerConfiguration.make(),
         sourceOfMayhem,
         statistics
       )
