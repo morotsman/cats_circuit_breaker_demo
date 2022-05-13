@@ -16,13 +16,15 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 final case class CircuitBreakerDemoState[F[_]](
                                                 currentAnimation: Option[Fiber[F, Throwable, Unit]],
-                                                demoProgram: Option[Fiber[F, Throwable, Unit]]
+                                                demoProgram: Option[Fiber[F, Throwable, Unit]],
+                                                  statisticsPoller: Option[Fiber[F, Throwable, Unit]]
                                               )
 
 object CircuitBreakerDemoState {
   def initial[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
     currentAnimation = None,
-    demoProgram = None
+    demoProgram = None,
+    statisticsPoller = None
   )
 }
 
@@ -43,10 +45,17 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 
   override def show(): F[Unit] = {
     for {
-      f <- animate(animation = staticAnimation).start
+      animation <- animate(animation = staticAnimation).start
+      statisticsPoller <- (forever(1.seconds) {
+        for {
+          info <- statistics.getStatisticsInfo()
+          _ <- console.writeString("statistics: " + info)
+        } yield ()
+      }).start
       _ <- {
         state.modify(s => (s.copy(
-          currentAnimation = Option(f)
+          currentAnimation = Option(animation),
+          statisticsPoller = Option(statisticsPoller)
         ), s))
       }
     } yield ()
@@ -112,6 +121,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
     s <- state.get
     _ <- s.currentAnimation.traverse(_.cancel)
     _ <- s.demoProgram.traverse(_.cancel)
+    _ <- s.statisticsPoller.traverse(_.cancel)
   } yield ()
 
 }
