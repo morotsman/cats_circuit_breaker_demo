@@ -91,7 +91,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                 _ <- state.modify(s => (s.copy(
                   demoConfiguration = s.demoConfiguration.copy(
                     delayBetweenCallToSourceOfMayhemInNanos =
-                      (s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos / 5)
+                      s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos / 5
                   )
                 ),
                   s))
@@ -110,7 +110,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                 _ <- state.modify(s => (s.copy(
                   demoConfiguration = s.demoConfiguration.copy(
                     delayBetweenCallToSourceOfMayhemInNanos =
-                      (s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos * 5)
+                      s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos * 5
                   )
                 ),
                   s))
