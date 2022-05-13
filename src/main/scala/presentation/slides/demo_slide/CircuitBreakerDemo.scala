@@ -5,7 +5,7 @@ import cats._
 import cats.effect._
 import cats.effect.implicits._
 import cats.implicits._
-import presentation.demo.{DemoProgram, SourceOfMayhem, Statistics}
+import presentation.demo.{DemoProgram, SourceOfMayhem, Statistics, StatisticsInfo}
 import presentation.tools.{Character, Input, NConsole, Slide}
 
 import com.github.morotsman.presentation.slides.demo_slide.animations.Static.staticAnimation
@@ -33,7 +33,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
       statisticsPoller <- (forever(1.seconds) {
         for {
           info <- statistics.getStatisticsInfo()
-          _ <- console.writeString("statistics: " + info)
+          _ <- state.modify(s => (s.copy(
+            statisticsInfo = info
+          ), s))
         } yield ()
       }).start
       _ <- {
@@ -78,11 +80,15 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
     Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
 
-  private def animate(frame: Int = 0, animation: List[String]): F[Unit] =
-    console.writeString(animation(frame)) >>
-      Temporal[F].sleep(500.milli) >>
-      console.clear() >>
-      animate(if (frame < animation.size - 1) frame + 1 else 0, animation)
+  private def animate(frame: Int = 0, animation: List[StatisticsInfo => String]): F[Unit] = {
+    for {
+      s <- state.get
+      _ <- console.writeString(animation(frame)(s.statisticsInfo)) >>
+        Temporal[F].sleep(500.milli) >>
+        console.clear() >>
+        animate(if (frame < animation.size - 1) frame + 1 else 0, animation)
+    } yield ()
+  }
 
   override def exit(): F[Unit] = for {
     s <- state.get

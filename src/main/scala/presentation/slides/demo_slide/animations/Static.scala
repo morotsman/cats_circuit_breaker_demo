@@ -3,9 +3,18 @@ package presentation.slides.demo_slide.animations
 
 import presentation.util.Colors
 
+import com.github.morotsman.presentation.demo.StatisticsInfo
+
 object Static {
+
+  val tmp: () => String = () => "hepp"
+
   val staticAnimation = List(
-    raw"""
+    (s: StatisticsInfo) => raw"""
+         |     ${s.circuitBreakerState}
+         |     Program called last second: ${s.programCalledSinceLastReport}
+         |     Request sent since last second: ${s.sentSinceLastReport}
+         |     Pending requests: ${s.pendingRequests}
          |
          |           __   Success                                                                                   __  call / raise circuit open
          |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
