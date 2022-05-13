@@ -5,28 +5,12 @@ import cats._
 import cats.effect._
 import cats.effect.implicits._
 import cats.implicits._
-import presentation.slides.demo_slide.animations.ClosedFailedUnderThreshold.closedFailedUnderThresholdAnimation
-import presentation.slides.demo_slide.animations.ClosedSuccess.closedSuccessAnimation
 import presentation.demo.{DemoProgram, SourceOfMayhem, Statistics}
 import presentation.tools.{Character, Input, NConsole, Slide}
 
 import com.github.morotsman.presentation.slides.demo_slide.animations.Static.staticAnimation
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
-
-final case class CircuitBreakerDemoState[F[_]](
-                                                currentAnimation: Option[Fiber[F, Throwable, Unit]],
-                                                demoProgram: Option[Fiber[F, Throwable, Unit]],
-                                                  statisticsPoller: Option[Fiber[F, Throwable, Unit]]
-                                              )
-
-object CircuitBreakerDemoState {
-  def initial[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
-    currentAnimation = None,
-    demoProgram = None,
-    statisticsPoller = None
-  )
-}
 
 final case class DemoConfiguration(
                                     maxFailures: Int,
