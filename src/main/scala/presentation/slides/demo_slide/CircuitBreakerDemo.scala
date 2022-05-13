@@ -62,23 +62,6 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 
   }
 
-  // poll for statistics, on change => update animation
-  /*
-              forever(1.seconds) {
-              for {
-                info <- statistics.getStatisticsInfo()
-                _ <- console.writeString("statistics: " + info)
-              } yield ()
-            }
-   */
-
-  private def showStatistics(): F[Unit] = forever(1.seconds) {
-    for {
-      info <- statistics.getStatisticsInfo()
-      _ <- console.writeString("statistics: " + info)
-    } yield ()
-  }
-
   override def userInput(input: Input): F[Unit] = for {
     _ <- input match {
       case Character(c) if c == 'f' =>

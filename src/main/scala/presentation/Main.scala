@@ -63,7 +63,7 @@ object Main extends IOApp {
     sourceOfMayhem <- Ref[IO].of(MayhemState(
       isFailing = false,
       successLatency = 30.millis,
-      requestTimeout = 1.seconds
+      requestTimeout = 5.seconds
     )).map(SourceOfMayhem.make[IO])
     statistics <- Ref[IO].of(StatisticsInfo(
       pendingRequests = 0,
