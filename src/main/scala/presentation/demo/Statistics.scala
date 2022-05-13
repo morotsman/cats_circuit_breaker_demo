@@ -18,10 +18,10 @@ trait Statistics[F[_]] {
 }
 
 final case class StatisticsInfo(
-                               pendingRequests: Int,
-                               sentSinceLastReport: Int,
-                               programCalledSinceLastReport: Int,
-                               circuitBreakerState: CircuitBreakerState
+                                 pendingRequests: Int,
+                                 sentSinceLastReport: Int,
+                                 programCalledSinceLastReport: Int,
+                                 circuitBreakerState: CircuitBreakerState
                                )
 
 object CircuitBreakerState extends Enumeration {

@@ -17,7 +17,7 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 final case class CircuitBreakerDemoState[F[_]](
                                                 currentAnimation: Option[Fiber[F, Throwable, Unit]],
                                                 demoProgram: Option[Fiber[F, Throwable, Unit]]
-                                        )
+                                              )
 
 object CircuitBreakerDemoState {
   def initial[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
@@ -32,13 +32,14 @@ final case class DemoConfiguration(
                                     maxResetTimeout: FiniteDuration
                                   )
 
-case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
-                                                                console: NConsole[F],
-                                                                demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
-                                                                sourceOfMayhem: SourceOfMayhem[F],
-                                                                statistics: Statistics[F],
-                                                                state: Ref[F, CircuitBreakerDemoState[F]]
-                                                              ) extends Slide[F] {
+case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
+(
+  console: NConsole[F],
+  demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
+  sourceOfMayhem: SourceOfMayhem[F],
+  statistics: Statistics[F],
+  state: Ref[F, CircuitBreakerDemoState[F]]
+) extends Slide[F] {
 
   override def show(): F[Unit] = {
     for {
@@ -53,17 +54,6 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
   }
 
   // poll for statistics, on change => update animation
-  // receive user input s => start program
-  // receive user input f => toggle error
-
-
-  private def showStatistics(): F[Unit] = forever(1.seconds) {
-    for {
-      info <- statistics.getStatisticsInfo()
-      _ <- console.writeString("statistics: " + info)
-    } yield ()
-  }
-
   /*
               forever(1.seconds) {
               for {
@@ -72,6 +62,13 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
               } yield ()
             }
    */
+
+  private def showStatistics(): F[Unit] = forever(1.seconds) {
+    for {
+      info <- statistics.getStatisticsInfo()
+      _ <- console.writeString("statistics: " + info)
+    } yield ()
+  }
 
   override def userInput(input: Input): F[Unit] = for {
     _ <- input match {
@@ -87,7 +84,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
                 maxResetTimeout = 30.seconds
               ), sourceOfMayhem, statistics
             )
-            _ <- forever(5.micros) {
+            _ <- forever(1.milli) {
               demoProgram.run().start
             }
           } yield ()).start
