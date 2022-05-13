@@ -28,7 +28,7 @@ object PresentationState {
 }
 
 object Presentation {
-  def make[F[_] : Monad : Temporal : Spawn](
+  def make[F[_] : Monad : Temporal](
                          console: NConsole[F],
                          state: Ref[F, PresentationState[F]]
                        ): F[Presentation[F]] = Monad[F].pure(
