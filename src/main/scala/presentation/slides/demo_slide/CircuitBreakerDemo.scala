@@ -26,6 +26,16 @@ object CircuitBreakerConfiguration {
   )
 }
 
+final case class DemoConfiguration(
+                                  delayBetweenCallToSourceOfMayhemInNanos: Int
+                                  )
+
+object DemoConfiguration {
+  def make(): DemoConfiguration = DemoConfiguration(
+    delayBetweenCallToSourceOfMayhemInNanos = 1000 * 1000 * 1000
+  )
+}
+
 case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 (
   console: NConsole[F],
@@ -67,26 +77,67 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
       case Character(c) if c == 'f' =>
         sourceOfMayhem.toggleFailure()
       case Character(c) if c == 's' =>
-        for {
-          s <- state.get
-          _ <- s.demoProgramExecutor.traverse(_.cancel)
-          demoProgramExecutor <- forever(1.seconds) {
-            s.demoProgram.traverse(_.run()).start
-          }.start
-          _ <- state.modify(s => (s.copy(
-            demoProgramExecutor = Option(demoProgramExecutor)
-          ), s))
-        } yield ()
+        updateProgramExecutor()
       case Character(c) if c == 'n' =>
         state.modify(s => (s.copy(
           previousInput = Option(input)
         ), s))
       case Character(c) if c == '+' =>
-        ???
+        for {
+          s <- state.get
+          _ <- s.previousInput.traverse {
+            case Character(c) if c == 'n' =>
+              for {
+                _ <- state.modify(s => (s.copy(
+                  demoConfiguration = s.demoConfiguration.copy(
+                    delayBetweenCallToSourceOfMayhemInNanos =
+                      (s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos / 5)
+                  )
+                ),
+                  s))
+                _ <- updateProgramExecutor()
+              } yield ()
+            case _ =>
+              Monad[F].unit
+          }
+        } yield ()
+      case Character(c) if c == '-' =>
+        for {
+          s <- state.get
+          _ <- s.previousInput.traverse {
+            case Character(c) if c == 'n' =>
+              for {
+                _ <- state.modify(s => (s.copy(
+                  demoConfiguration = s.demoConfiguration.copy(
+                    delayBetweenCallToSourceOfMayhemInNanos =
+                      (s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos * 5)
+                  )
+                ),
+                  s))
+                _ <- updateProgramExecutor()
+              } yield ()
+            case _ =>
+              Monad[F].unit
+          }
+        } yield ()
+
       case _ =>
         Monad[F].unit
     }
   } yield true
+
+  private def updateProgramExecutor() = {
+    for {
+      s <- state.get
+      _ <- s.demoProgramExecutor.traverse(_.cancel)
+      demoProgramExecutor <- forever(s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos.nanos) {
+        s.demoProgram.traverse(_.run()).start
+      }.start
+      _ <- state.modify(s => (s.copy(
+        demoProgramExecutor = Option(demoProgramExecutor)
+      ), s))
+    } yield ()
+  }
 
   private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
     Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)

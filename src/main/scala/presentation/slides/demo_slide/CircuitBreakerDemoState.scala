@@ -12,7 +12,8 @@ final case class CircuitBreakerDemoState[F[_]](
                                                 demoProgramExecutor: Option[Fiber[F, Throwable, Unit]],
                                                 statisticsPoller: Option[Fiber[F, Throwable, Unit]],
                                                 statisticsInfo: StatisticsInfo,
-                                                previousInput: Option[Input]
+                                                previousInput: Option[Input],
+                                                demoConfiguration: DemoConfiguration
                                               )
 
 object CircuitBreakerDemoState {
@@ -27,6 +28,7 @@ object CircuitBreakerDemoState {
       programCalledSinceLastReport = 0,
       circuitBreakerState = CircuitBreakerState.CLOSED
     ),
-    previousInput = None
+    previousInput = None,
+    demoConfiguration = DemoConfiguration.make()
   )
 }
