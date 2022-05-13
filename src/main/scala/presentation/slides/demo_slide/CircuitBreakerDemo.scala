@@ -44,7 +44,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
           _ <- state.modify(s => (s.copy(
             statisticsInfo = info
           ), s))
-        } yield ()x
+        } yield ()
       }.start
       demoProgram <- demoProgramFactory(
         CircuitBreakerConfiguration.make(),
