@@ -15,14 +15,16 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 final case class DemoConfiguration(
                                     maxFailures: Int,
                                     resetTimeout: FiniteDuration,
-                                    maxResetTimeout: FiniteDuration
+                                    maxResetTimeout: FiniteDuration,
+                                    timeBetweenCallToSourceOfMayhem: FiniteDuration
                                   )
 
 object DemoConfiguration {
   def make():DemoConfiguration =  DemoConfiguration(
     maxFailures = 5,
     resetTimeout = 3.seconds,
-    maxResetTimeout = 30.seconds
+    maxResetTimeout = 30.seconds,
+    timeBetweenCallToSourceOfMayhem = (1000 * 1000 * 1000).nanos
   )
 }
 
