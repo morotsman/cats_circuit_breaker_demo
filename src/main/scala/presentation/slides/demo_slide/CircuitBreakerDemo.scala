@@ -74,8 +74,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
       case Character(c) if c == 'n' =>
         state.modify(s => (s.copy(
           previousInput = Option(input)
-        )
-          , s))
+        ), s))
       case Character(c) if c == '+' =>
         ???
       case _ =>
