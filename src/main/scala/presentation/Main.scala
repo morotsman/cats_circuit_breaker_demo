@@ -17,7 +17,7 @@ object Main extends IOApp {
     (for {
       console <- NConsole.make[IO]()
       (sourceOfMayhem, statistics) <- setupDemoApp()
-      circuitBreakerDemoSlide <- Ref[IO].of(CircuitBreakerDemoState.initial()).map(CircuitBreakerDemo[IO](
+      circuitBreakerDemoSlide <- Ref[IO].of(CircuitBreakerDemoState.initial[IO]()).map(CircuitBreakerDemo[IO](
         console = console,
         demoProgramFactory = createDemoApp,
         sourceOfMayhem = sourceOfMayhem,

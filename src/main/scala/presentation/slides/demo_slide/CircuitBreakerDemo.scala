@@ -10,14 +10,18 @@ import presentation.slides.demo_slide.animations.ClosedSuccess.closedSuccessAnim
 import presentation.demo.{DemoProgram, SourceOfMayhem, Statistics}
 import presentation.tools.{Character, Input, NConsole, Slide}
 
+import com.github.morotsman.presentation.slides.demo_slide.animations.Static.staticAnimation
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-final case class CircuitBreakerDemoState(
+final case class CircuitBreakerDemoState[F[_]](
+                                        currentWork: Option[Fiber[F, Throwable, Unit]]
                                         )
 
 object CircuitBreakerDemoState {
-  def initial(): CircuitBreakerDemoState = CircuitBreakerDemoState()
+  def initial[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
+    currentWork = None
+  )
 }
 
 final case class DemoConfiguration(
@@ -31,21 +35,25 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
                                                                 demoProgramFactory: (DemoConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
                                                                 sourceOfMayhem: SourceOfMayhem[F],
                                                                 statistics: Statistics[F],
-                                                                state: Ref[F, CircuitBreakerDemoState]
+                                                                state: Ref[F, CircuitBreakerDemoState[F]]
                                                               ) extends Slide[F] {
 
-  override def show(): F[Fiber[F, Throwable, Unit]] = {
-    val tmp: F[Unit] = forever(1.seconds) {
-      for {
-        info <- statistics.getStatisticsInfo()
-        _ <- console.writeString("statistics: " + info)
-      } yield ()
-    }
+  override def show(): F[Unit] = {
+    for {
+      f <- animate(animation = closedSuccessAnimation).start
+      _ <- {
+        state.modify(s => (s.copy(
+          currentWork = Option(f)
+        ), s))
+      }
+    } yield ()
 
-
-
-    animate(animation = closedSuccessAnimation).start
   }
+
+  // poll for statistics, on change => update animation
+  // receive user input s => start program
+  // receive user input f => toggle error
+
 
   private def showStatistics(): F[Unit] = forever(1.seconds) {
     for {
@@ -54,13 +62,21 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
     } yield ()
   }
 
+  /*
+              forever(1.seconds) {
+              for {
+                info <- statistics.getStatisticsInfo()
+                _ <- console.writeString("statistics: " + info)
+              } yield ()
+            }
+   */
+
   override def userInput(input: Input): F[Unit] = for {
-    _ <- console.clear()
     _ <- input match {
       case Character(c) if c == 'f' =>
-        animate(animation = closedFailedUnderThresholdAnimation).map(_ => true)
+        sourceOfMayhem.toggleFailure()
       case Character(c) if c == 's' =>
-        for {
+        (for {
           demoProgram <- demoProgramFactory(
             DemoConfiguration(
               maxFailures = 5,
@@ -68,18 +84,10 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
               maxResetTimeout = 30.seconds
             ), sourceOfMayhem, statistics
           )
-          _ <- (
-            forever(5.micros) {
+          _ <- forever(5.micros) {
               demoProgram.run().start
-            },
-            forever(1.seconds) {
-              for {
-                info <- statistics.getStatisticsInfo()
-                _ <- console.writeString("statistics: " + info)
-              } yield ()
             }
-            ).parTupled
-        } yield ()
+        } yield ()).start
       case _ =>
         Monad[F].unit
     }
@@ -93,5 +101,10 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
       Temporal[F].sleep(500.milli) >>
       console.clear() >>
       animate(if (frame < animation.size - 1) frame + 1 else 0, animation)
+
+  override def exit(): F[Unit] = for {
+    s <- state.get
+    _ <- s.currentWork.traverse(_.cancel)
+  } yield ()
 
 }

@@ -3,30 +3,28 @@ package presentation.tools
 
 import cats._
 import cats.effect._
-import cats.effect.implicits._
 import cats.implicits._
 
 trait Presentation[F[_]] {
-  def start(): F[Fiber[F, Throwable, Unit]]
+  def start(): F[Unit]
 
-  def nextSlide(): F[Fiber[F, Throwable, Unit]]
+  def nextSlide(): F[Unit]
 
-  def previousSlide(): F[Fiber[F, Throwable, Unit]]
+  def previousSlide(): F[Unit]
 
-  def exit(): F[Fiber[F, Throwable, Unit]]
+  def exit(): F[Unit]
 
-  def userInput(input: Input): F[Fiber[F, Throwable, Unit]]
+  def userInput(input: Input): F[Unit]
 }
 
 final case class PresentationState[F[_]](
                                           slideIndex: Int,
-                                          slides: List[Slide[F]],
-                                          ongoingWork: Option[Fiber[F, Throwable, Unit]]
+                                          slides: List[Slide[F]]
                                         )
 
 object PresentationState {
   def initialState[F[_]](slides: List[Slide[F]]): PresentationState[F] =
-    PresentationState[F](0, slides, None)
+    PresentationState[F](0, slides)
 }
 
 object Presentation {
@@ -35,13 +33,13 @@ object Presentation {
                          state: Ref[F, PresentationState[F]]
                        ): F[Presentation[F]] = Monad[F].pure(
     new Presentation[F] {
-      override def start(): F[Fiber[F, Throwable, Unit]] = for {
+      override def start(): F[Unit] = for {
         _ <- console.clear()
         state <- state.get
-        f <- state.slides.head.show()
-      } yield f
+        _ <- state.slides.head.show()
+      } yield ()
 
-      override def nextSlide(): F[Fiber[F, Throwable, Unit]]= for {
+      override def nextSlide(): F[Unit]= for {
         _ <- console.clear()
         state <- state.updateAndGet(s =>
           if (s.slideIndex == s.slides.size - 1) {
@@ -50,10 +48,10 @@ object Presentation {
             s.copy(slideIndex = s.slideIndex + 1)
           }
         )
-        f <- state.slides(state.slideIndex).show()
-      } yield f
+        _ <- state.slides(state.slideIndex).show()
+      } yield ()
 
-      override def previousSlide(): F[Fiber[F, Throwable, Unit]] = for {
+      override def previousSlide(): F[Unit] = for {
         _ <- console.clear()
         state <- state.updateAndGet(s =>
           if (s.slideIndex > 0) {
@@ -65,42 +63,29 @@ object Presentation {
         f <- state.slides(state.slideIndex).show()
       } yield f
 
-      override def exit(): F[Fiber[F, Throwable, Unit]] = ???
+      override def exit(): F[Unit] = ???
 
-      override def userInput(input: Input): F[Fiber[F, Throwable, Unit]] = for {
+      override def userInput(input: Input): F[Unit] = for {
         presentationState <- state.get
-        f <- input match {
+        _ <- input match {
           case Key(k) if k == SpecialKey.Left =>
             for {
-              _ <- presentationState.ongoingWork.traverse(_.cancel)
-              f <- previousSlide()
-              _ <- state.modify(s =>
-                  (s.copy(
-                    ongoingWork = Option(f)
-                  ), s))
-            } yield f
+              _ <- presentationState.slides(presentationState.slideIndex).exit()
+              _ <- previousSlide()
+            } yield ()
           case Key(k) if k == SpecialKey.Right =>
             for {
-              _ <- presentationState.ongoingWork.traverse(_.cancel)
-              f <- nextSlide()
-              _ <- state.modify(s =>
-                (s.copy(
-                  ongoingWork = Option(f)
-                ), s))
-            } yield f
+              _ <- presentationState.slides(presentationState.slideIndex).exit()
+              _ <- nextSlide()
+            } yield ()
           case _ =>
             for {
               presentationState <- state.get
               slide = presentationState.slides(presentationState.slideIndex)
-              _ <- presentationState.ongoingWork.traverse(_.cancel)
-              f <- slide.userInput(input).start
-              _ <- state.modify(s =>
-                (s.copy(
-                  ongoingWork = Option(f)
-                ), s))
-            } yield f
+              _ <- slide.userInput(input)
+            } yield ()
         }
-      } yield f
+      } yield ()
 
     }
   )

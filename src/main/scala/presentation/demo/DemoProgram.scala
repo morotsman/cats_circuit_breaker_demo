@@ -11,6 +11,7 @@ case class DemoProgram[F[_] : MonadError[*[_], Throwable]](
                                                           statistics: Statistics[F]
                                                           ) {
   def run(): F[Unit] = for {
+    _ <- MonadError[F, Throwable].pure(println("hepp"))
     _ <- statistics.programCalled()
     _ <- circuitBreaker.protect {
       statistics.requestSent() >>
