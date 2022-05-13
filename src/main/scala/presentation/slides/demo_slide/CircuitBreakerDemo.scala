@@ -18,6 +18,14 @@ final case class DemoConfiguration(
                                     maxResetTimeout: FiniteDuration
                                   )
 
+object DemoConfiguration {
+  def make():DemoConfiguration =  DemoConfiguration(
+    maxFailures = 5,
+    resetTimeout = 3.seconds,
+    maxResetTimeout = 30.seconds
+  )
+}
+
 case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 (
   console: NConsole[F],
@@ -39,11 +47,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         } yield ()
       }.start
       demoProgram <- demoProgramFactory(
-        DemoConfiguration(
-          maxFailures = 5,
-          resetTimeout = 3.seconds,
-          maxResetTimeout = 30.seconds
-        ), sourceOfMayhem, statistics
+        DemoConfiguration.make(),
+        sourceOfMayhem,
+        statistics
       )
       _ <- {
         state.modify(s => (s.copy(
