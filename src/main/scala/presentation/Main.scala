@@ -36,6 +36,7 @@ object Main extends IOApp {
     } yield ()).map(_ => ExitCode.Success)
   }
 
+  // TODO, move this to CircuitBreakerDemo
   private def createDemoApp(
                              configuration: CircuitBreakerConfiguration,
                              sourceOfMayhem: SourceOfMayhem[IO],
