@@ -30,18 +30,26 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   override def show(): F[Unit] = {
     for {
       animation <- animate(animation = staticAnimation).start
-      statisticsPoller <- (forever(1.seconds) {
+      statisticsPoller <- forever(1.seconds) {
         for {
           info <- statistics.getStatisticsInfo()
           _ <- state.modify(s => (s.copy(
             statisticsInfo = info
           ), s))
         } yield ()
-      }).start
+      }.start
+      demoProgram <- demoProgramFactory(
+        DemoConfiguration(
+          maxFailures = 5,
+          resetTimeout = 3.seconds,
+          maxResetTimeout = 30.seconds
+        ), sourceOfMayhem, statistics
+      )
       _ <- {
         state.modify(s => (s.copy(
           currentAnimation = Option(animation),
-          statisticsPoller = Option(statisticsPoller)
+          statisticsPoller = Option(statisticsPoller),
+          demoProgram = Option(demoProgram)
         ), s))
       }
     } yield ()
@@ -54,24 +62,22 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         sourceOfMayhem.toggleFailure()
       case Character(c) if c == 's' =>
         for {
-          f <- (for {
-            demoProgram <- demoProgramFactory(
-              DemoConfiguration(
-                maxFailures = 5,
-                resetTimeout = 3.seconds,
-                maxResetTimeout = 30.seconds
-              ), sourceOfMayhem, statistics
-            )
-            _ <- forever(1.milli) {
-              demoProgram.run().start
-            }
-          } yield ()).start
-          _ <- {
-            state.modify(s => (s.copy(
-              demoProgram = Option(f)
-            ), s))
-          }
+          s <- state.get
+          _ <- s.demoProgramExecutor.traverse(_.cancel)
+          demoProgramExecutor <- forever(1.seconds) {
+            s.demoProgram.traverse(_.run()).start
+          }.start
+          _ <- state.modify(s => (s.copy(
+            demoProgramExecutor = Option(demoProgramExecutor)
+          ), s))
         } yield ()
+      case Character(c) if c == 'n' =>
+        state.modify(s => (s.copy(
+          previousInput = Option(input)
+        )
+          , s))
+      case Character(c) if c == '+' =>
+        ???
       case _ =>
         Monad[F].unit
     }
@@ -93,7 +99,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   override def exit(): F[Unit] = for {
     s <- state.get
     _ <- s.currentAnimation.traverse(_.cancel)
-    _ <- s.demoProgram.traverse(_.cancel)
+    _ <- s.demoProgramExecutor.traverse(_.cancel)
     _ <- s.statisticsPoller.traverse(_.cancel)
   } yield ()
 
