@@ -15,12 +15,12 @@ import com.github.morotsman.presentation.slides.demo_slide.animations.Static.sta
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 final case class CircuitBreakerDemoState[F[_]](
-                                        currentWork: Option[Fiber[F, Throwable, Unit]]
+                                                currentAnimation: Option[Fiber[F, Throwable, Unit]]
                                         )
 
 object CircuitBreakerDemoState {
   def initial[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
-    currentWork = None
+    currentAnimation = None
   )
 }
 
@@ -43,7 +43,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
       f <- animate(animation = closedSuccessAnimation).start
       _ <- {
         state.modify(s => (s.copy(
-          currentWork = Option(f)
+          currentAnimation = Option(f)
         ), s))
       }
     } yield ()
@@ -104,7 +104,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn](
 
   override def exit(): F[Unit] = for {
     s <- state.get
-    _ <- s.currentWork.traverse(_.cancel)
+    _ <- s.currentAnimation.traverse(_.cancel)
   } yield ()
 
 }
