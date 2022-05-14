@@ -19,6 +19,8 @@ trait SourceOfMayhem[F[_]] {
   def increaseRequestTimeout(): F[Unit]
 
   def decreaseRequestTimeout(): F[Unit]
+
+  def mayhemState(): F[MayhemState]
 }
 
 final case class MayhemState(
@@ -58,10 +60,13 @@ object SourceOfMayhem {
         state.modify(s => (s.copy(requestTimeoutInMillis = s.requestTimeoutInMillis * 2), s))
 
       override def decreaseSuccessLatency(): F[Unit] =
-        state.modify(s => (s.copy(successLatencyInMillis = s.successLatencyInMillis * 2), s))
+        state.modify(s => (s.copy(successLatencyInMillis = s.successLatencyInMillis / 2), s))
 
       override def decreaseRequestTimeout(): F[Unit] =
-        state.modify(s => (s.copy(requestTimeoutInMillis = s.requestTimeoutInMillis * 2), s))
+        state.modify(s => (s.copy(requestTimeoutInMillis = s.requestTimeoutInMillis / 2), s))
+
+      override def mayhemState(): F[MayhemState] =
+        state.get
     }
 
 }

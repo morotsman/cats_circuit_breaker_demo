@@ -5,9 +5,8 @@ import cats._
 import cats.effect._
 import cats.effect.implicits._
 import cats.implicits._
-import presentation.demo.{DemoProgram, SourceOfMayhem, Statistics, StatisticsInfo}
+import presentation.demo.{DemoProgram, MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
 import presentation.tools.{Character, Input, NConsole, Slide}
-
 import presentation.slides.demo_slide.animations.Static.staticAnimation
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -114,9 +113,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                   s))
                 _ <- updateProgramExecutor()
               } yield ()
-            case Character(c) if c == 'l' && s.isStarted =>
+            case Character(c) if c == 'l' =>
               sourceOfMayhem.increaseSuccessLatency()
-            case Character(c) if c == 't' && s.isStarted =>
+            case Character(c) if c == 't' =>
               sourceOfMayhem.increaseRequestTimeout()
             case _ =>
               Monad[F].unit
@@ -137,9 +136,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                   s))
                 _ <- updateProgramExecutor()
               } yield ()
-            case Character(c) if c == 'l' && s.isStarted =>
+            case Character(c) if c == 'l' =>
               sourceOfMayhem.decreaseSuccessLatency()
-            case Character(c) if c == 't' && s.isStarted =>
+            case Character(c) if c == 't' =>
               sourceOfMayhem.decreaseRequestTimeout()
             case _ =>
               Monad[F].unit
@@ -167,10 +166,11 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
     Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
 
-  private def animate(frame: Int = 0, animation: List[(StatisticsInfo, Option[Input], Boolean, Boolean) => String]): F[Unit] = {
+  private def animate(frame: Int = 0, animation: List[(StatisticsInfo, Option[Input], Boolean, MayhemState) => String]): F[Unit] = {
     for {
       s <- state.get
-      _ <- console.writeString(animation(frame)(s.statisticsInfo, s.previousInput, s.isStarted, s.isFailing)) >>
+      mayhemState <- sourceOfMayhem.mayhemState
+      _ <- console.writeString(animation(frame)(s.statisticsInfo, s.previousInput, s.isStarted, mayhemState)) >>
         Temporal[F].sleep(500.milli) >>
         console.clear() >>
         animate(if (frame < animation.size - 1) frame + 1 else 0, animation)

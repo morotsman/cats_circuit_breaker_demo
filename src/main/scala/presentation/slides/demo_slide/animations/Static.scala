@@ -1,18 +1,17 @@
 package com.github.morotsman
 package presentation.slides.demo_slide.animations
 
-import presentation.demo.StatisticsInfo
+import presentation.demo.{MayhemState, StatisticsInfo}
 import presentation.tools.{Character, Input}
 
-import com.github.morotsman.presentation.util
-import com.github.morotsman.presentation.util.Colors.{ANSI_GREEN, ANSI_RESET}
+import presentation.util.Colors.{ANSI_GREEN, ANSI_RESET}
 
 object Static {
 
   val staticAnimation = List(
-    (s: StatisticsInfo, p: Option[Input], isStarted: Boolean, isFailing: Boolean) =>
+    (s: StatisticsInfo, p: Option[Input], isStarted: Boolean, mayhemState: MayhemState) =>
       raw"""
-           |     ${showCircuitBreakerState(s, 40)}
+           |     ${showCircuitBreakerState(s, 40)} ${showSuccessLatency(mayhemState, 40)} ${showRequestTimeout(mayhemState, 40)}
            |     ${showProgramCalled(s, 40)} ${showAverageProgramCallTime(s, 40)}
            |     ${showSourceOfMayhemCalled(s, 40)} ${showAverageSourceOfMayhemCallTime(s, 40)}
            |     ${showPendingRequests(s, 40)}
@@ -39,7 +38,7 @@ object Static {
            |           fail (under threshold)                       | |                                         |_|                     |_|
            |                                                        | |                                         | |                     | |
            |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
-           |  ${toggleFailure(isFailing, 38)}                | |                                         | |                    \|_|/
+           |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
            |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
            |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
            |  ${timeout(p, 24)}                              | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
@@ -58,8 +57,8 @@ object Static {
     if (!isStarted) constantWidth("Start/Stop: s", width)
     else constantWidth(ANSI_GREEN + "Start/Stop: s" + ANSI_RESET, width + 9)
 
-  private def toggleFailure(isFailing: Boolean, width: Int): String =
-    if (!isFailing) constantWidth("Toggle fail: f", width)
+  private def toggleFailure(mayhemState: MayhemState, width: Int): String =
+    if (!mayhemState.isFailing) constantWidth("Toggle fail: f", width)
     else constantWidth(ANSI_GREEN + "Toggle fail: f" + ANSI_RESET, width + 9)
 
   private def numberOfRequests(previousInput: Option[Input], width: Int): String = {
@@ -78,6 +77,12 @@ object Static {
     previousInput.filter(_ == Character('l')).fold(constantWidth("Success latency: l +/-", width)) { _ =>
       constantWidth(s"Success latency: ${ANSI_GREEN + "l" + ANSI_RESET} +/-", width + 9)
     }
+
+  private def showSuccessLatency(s: MayhemState, width: Int) =
+    constantWidth(s"Success latency: ${s.successLatencyInMillis} ms", width)
+
+  private def showRequestTimeout(s: MayhemState, width: Int) =
+    constantWidth(s"Request timeout: ${s.requestTimeoutInMillis} ms", width)
 
   private def showAverageProgramCallTime(s: StatisticsInfo, width: Int) =
     if (s.programCompletedIn.nonEmpty) {
