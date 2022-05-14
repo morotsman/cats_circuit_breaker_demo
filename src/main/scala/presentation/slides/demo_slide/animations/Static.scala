@@ -10,7 +10,7 @@ import com.github.morotsman.presentation.util.Colors.{ANSI_GREEN, ANSI_RESET}
 object Static {
 
   val staticAnimation = List(
-    (s: StatisticsInfo, p: Option[Input]) =>
+    (s: StatisticsInfo, p: Option[Input], isStarted: Boolean, isFailing: Boolean) =>
       raw"""
            |     ${showCircuitBreakerState(s, 40)}
            |     ${showProgramCalled(s, 40)} ${showAverageProgramCallTime(s, 40)}
@@ -38,9 +38,9 @@ object Static {
            |        \_\                                             | |                                         | |                     | |
            |           fail (under threshold)                       | |                                         |_|                     |_|
            |                                                        | |                                         | |                     | |
-           |  Start/Stop: s                                         | |                                         | |                     | |
-           |  ${numberOfRequests(p, 33)}                     | |                                         | |                    \|_|/
-           |  Toggle fail: f                                        | |                                        fail                     \ /
+           |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+           |  ${toggleFailure(isFailing, 38)}                | |                                         | |                    \|_|/
+           |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
            |  Success latency: l +/-                                | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
            |  Timeout: t +/-                                        | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
            |  Failure threshold: a +/-                              | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
@@ -53,6 +53,14 @@ object Static {
            |
            |""".stripMargin
   )
+
+  private def startStop(isStarted: Boolean, width: Int): String =
+    if (!isStarted) constantWidth("Start/Stop: s", width)
+    else constantWidth(ANSI_GREEN + "Start/Stop: s" + ANSI_RESET, width + 9)
+
+  private def toggleFailure(isFailing: Boolean, width: Int): String =
+    if (!isFailing) constantWidth("Toggle fail: f", width)
+    else constantWidth(ANSI_GREEN + "Toggle fail: f" + ANSI_RESET, width + 9)
 
   private def numberOfRequests(previousInput: Option[Input], width: Int): String =
     previousInput.fold(constantWidth("Number of requests: n +/-", width)) { input =>

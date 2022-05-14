@@ -13,7 +13,9 @@ final case class CircuitBreakerDemoState[F[_]](
                                                 statisticsPoller: Option[Fiber[F, Throwable, Unit]],
                                                 statisticsInfo: StatisticsInfo,
                                                 previousInput: Option[Input],
-                                                demoConfiguration: DemoConfiguration
+                                                demoConfiguration: DemoConfiguration,
+                                                isFailing: Boolean,
+                                                isStarted: Boolean
                                               )
 
 object CircuitBreakerDemoState {
@@ -24,6 +26,8 @@ object CircuitBreakerDemoState {
     statisticsPoller = None,
     statisticsInfo = StatisticsInfo.make(),
     previousInput = None,
-    demoConfiguration = DemoConfiguration.make()
+    demoConfiguration = DemoConfiguration.make(),
+    isFailing = false,
+    isStarted = false
   )
 }

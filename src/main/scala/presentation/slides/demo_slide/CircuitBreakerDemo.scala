@@ -75,9 +75,23 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   override def userInput(input: Input): F[Unit] = for {
     _ <- input match {
       case Character(c) if c == 'f' =>
-        sourceOfMayhem.toggleFailure()
+        sourceOfMayhem.toggleFailure() >> state.modify(s => (s.copy(
+          isFailing = !s.isFailing
+        ), s))
       case Character(c) if c == 's' =>
-        updateProgramExecutor()
+        for {
+          s <- state.get
+          _ <- if (s.demoProgramExecutor.isDefined) {
+            s.demoProgramExecutor.traverse(_.cancel) >> state.modify(s => (s.copy(
+              demoProgramExecutor = None,
+              isStarted = false
+            ), s))
+          } else {
+            updateProgramExecutor() >> state.modify(s => (s.copy(
+              isStarted = true
+            ), s))
+          }
+        } yield ()
       case Character(c) if c == 'n' =>
         state.modify(s => (s.copy(
           previousInput = Option(input)
@@ -142,10 +156,10 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
     Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
 
-  private def animate(frame: Int = 0, animation: List[(StatisticsInfo, Option[Input]) => String]): F[Unit] = {
+  private def animate(frame: Int = 0, animation: List[(StatisticsInfo, Option[Input], Boolean, Boolean) => String]): F[Unit] = {
     for {
       s <- state.get
-      _ <- console.writeString(animation(frame)(s.statisticsInfo, s.previousInput)) >>
+      _ <- console.writeString(animation(frame)(s.statisticsInfo, s.previousInput, s.isStarted, s.isFailing)) >>
         Temporal[F].sleep(500.milli) >>
         console.clear() >>
         animate(if (frame < animation.size - 1) frame + 1 else 0, animation)
