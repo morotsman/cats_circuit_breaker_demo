@@ -11,7 +11,7 @@ object Static {
     (s: StatisticsInfo) => raw"""
          |     ${showCircuitBreakerState(s, 40)} hepp
          |     ${showProgramCalled(s, 40)} hepp
-         |     ${showSourceOfMayhemCalled(s, 40)} hepp
+         |     ${showSourceOfMayhemCalled(s, 40)} ${showAverageSourceOfMayhemCallTime(s, 40)}
          |     ${showPendingRequests(s, 40)} hepp
          |
          |           __   Success                                                                                   __  call / raise circuit open
@@ -50,6 +50,14 @@ object Static {
          |
          |""".stripMargin
   )
+
+  private def showAverageSourceOfMayhemCallTime(s: StatisticsInfo, width: Int) = {
+    if (s.requestsCompletedIn.length > 0) {
+      constantWidth(s"Average time: ${s.requestsCompletedIn.sum/s.requestsCompletedIn.length} ms", width)
+    } else {
+      constantWidth(s"Average time: 0 ms", width)
+    }
+  }
 
   private def showPendingRequests(s: StatisticsInfo, width: Int) = {
     constantWidth(s"Pending requests: ${s.pendingRequests}", width)

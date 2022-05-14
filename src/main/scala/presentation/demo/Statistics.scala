@@ -10,6 +10,8 @@ trait Statistics[F[_]] {
 
   def requestCompleted(): F[Unit]
 
+  def requestCompletedIn(millis: Long): F[Unit]
+
   def programCalled(): F[Unit]
 
   def circuitBreakerStateChange(state: CircuitBreakerState): F[Unit]
@@ -21,8 +23,19 @@ final case class StatisticsInfo(
                                  pendingRequests: Int,
                                  sentSinceLastReport: Int,
                                  programCalledSinceLastReport: Int,
-                                 circuitBreakerState: CircuitBreakerState
+                                 circuitBreakerState: CircuitBreakerState,
+                                 requestsCompletedIn: List[Long]
                                )
+
+object StatisticsInfo {
+  def make(): StatisticsInfo = StatisticsInfo(
+    pendingRequests = 0,
+    sentSinceLastReport = 0,
+    programCalledSinceLastReport = 0,
+    circuitBreakerState = CircuitBreakerState.CLOSED,
+    requestsCompletedIn = List.empty
+  )
+}
 
 object CircuitBreakerState extends Enumeration {
   type CircuitBreakerState = Value
@@ -48,7 +61,14 @@ object Statistics {
       ref.modify(s => (s.copy(circuitBreakerState = state), s))
 
     override def getStatisticsInfo(): F[StatisticsInfo] =
-      ref.getAndUpdate(s => s.copy(sentSinceLastReport = 0, programCalledSinceLastReport = 0))
+      ref.getAndUpdate(s => s.copy(
+        sentSinceLastReport = 0,
+        programCalledSinceLastReport = 0,
+        requestsCompletedIn = List()
+      ))
+
+    override def requestCompletedIn(millis: Long): F[Unit] =
+      ref.modify(s => (s.copy(requestsCompletedIn = millis :: s.requestsCompletedIn), s))
   }
 
 }

@@ -22,12 +22,7 @@ object CircuitBreakerDemoState {
     demoProgram = None,
     demoProgramExecutor = None,
     statisticsPoller = None,
-    statisticsInfo = StatisticsInfo(
-      pendingRequests = 0,
-      sentSinceLastReport = 0,
-      programCalledSinceLastReport = 0,
-      circuitBreakerState = CircuitBreakerState.CLOSED
-    ),
+    statisticsInfo = StatisticsInfo.make(),
     previousInput = None,
     demoConfiguration = DemoConfiguration.make()
   )

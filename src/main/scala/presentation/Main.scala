@@ -66,12 +66,7 @@ object Main extends IOApp {
       successLatency = 30.millis,
       requestTimeout = 5.seconds
     )).map(SourceOfMayhem.make[IO])
-    statistics <- Ref[IO].of(StatisticsInfo(
-      pendingRequests = 0,
-      sentSinceLastReport = 0,
-      programCalledSinceLastReport = 0,
-      circuitBreakerState = CircuitBreakerState.CLOSED
-    )).map(Statistics.make[IO])
+    statistics <- Ref[IO].of(StatisticsInfo.make()).map(Statistics.make[IO])
   } yield (sourceOfMayhem, statistics)
 
   def handleInput(c: NConsole[IO], presentation: Presentation[IO]): IO[Input] = for {

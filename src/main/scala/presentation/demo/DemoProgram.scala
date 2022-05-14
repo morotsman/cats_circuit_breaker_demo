@@ -13,10 +13,14 @@ case class DemoProgram[F[_] : MonadError[*[_], Throwable]](
   def run(): F[Unit] = for {
     _ <- statistics.programCalled()
     _ <- circuitBreaker.protect {
-      statistics.requestSent() >>
-        sourceOfMayhem.mightFail().attemptTap(_ =>
-          statistics.requestCompleted()
+      for {
+        _ <- statistics.requestSent()
+        startTime = System.currentTimeMillis()
+        _ <- sourceOfMayhem.mightFail().attemptTap(_ =>
+          statistics.requestCompleted() >>
+            statistics.requestCompletedIn(System.currentTimeMillis() - startTime)
         )
+      } yield ()
     }.handleError(_ => ())
   } yield ()
 
