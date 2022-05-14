@@ -9,10 +9,10 @@ object Static {
 
   val staticAnimation = List(
     (s: StatisticsInfo) => raw"""
-         |     ${showCircuitBreakerState(s, 40)} hepp
-         |     ${showProgramCalled(s, 40)} hepp
+         |     ${showCircuitBreakerState(s, 40)}
+         |     ${showProgramCalled(s, 40)} ${showAverageProgramCallTime(s, 40)}
          |     ${showSourceOfMayhemCalled(s, 40)} ${showAverageSourceOfMayhemCallTime(s, 40)}
-         |     ${showPendingRequests(s, 40)} hepp
+         |     ${showPendingRequests(s, 40)}
          |
          |           __   Success                                                                                   __  call / raise circuit open
          |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
@@ -51,8 +51,16 @@ object Static {
          |""".stripMargin
   )
 
+  private def showAverageProgramCallTime(s: StatisticsInfo, width: Int) = {
+    if (s.programCompletedIn.nonEmpty) {
+      constantWidth(s"Average time: ${s.programCompletedIn.sum/s.programCompletedIn.length} ms", width)
+    } else {
+      constantWidth(s"Average time: 0 ms", width)
+    }
+  }
+
   private def showAverageSourceOfMayhemCallTime(s: StatisticsInfo, width: Int) = {
-    if (s.requestsCompletedIn.length > 0) {
+    if (s.requestsCompletedIn.nonEmpty) {
       constantWidth(s"Average time: ${s.requestsCompletedIn.sum/s.requestsCompletedIn.length} ms", width)
     } else {
       constantWidth(s"Average time: 0 ms", width)
