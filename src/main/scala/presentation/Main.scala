@@ -2,9 +2,9 @@ package com.github.morotsman
 package presentation
 
 import cats.effect._
-import com.github.morotsman.presentation.slides.demo_slide.{CircuitBreakerSlide, CircuitBreakerSlideState}
-import com.github.morotsman.presentation.slides.{Agenda, Start}
-import com.github.morotsman.presentation.tools.{Input, NConsole, Presentation, PresentationState}
+import presentation.slides.demo_slide.{CircuitBreakerSlide, CircuitBreakerSlideState}
+import presentation.slides.{Agenda, Start}
+import presentation.tools.{Input, NConsole, Presentation, PresentationState}
 
 object Main extends IOApp {
 
