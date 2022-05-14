@@ -9,12 +9,19 @@ object Static {
 
   val tmp: () => String = () => "hepp"
 
+  def constantWidth(s: String, width: Int): String =
+    if (s.length > width) {
+      s.take(width)
+    } else if (s.length < width) {
+      s + (" " * (width - s.length))
+    } else s
+
   val staticAnimation = List(
     (s: StatisticsInfo) => raw"""
-         |     ${s.circuitBreakerState}
-         |     Program called last second: ${s.programCalledSinceLastReport}
-         |     Request sent since last second: ${s.sentSinceLastReport}
-         |     Pending requests: ${s.pendingRequests}
+         |     ${showCircuitBreakerState(s, 40)} hepp
+         |     ${showProgramCalled(s, 40)} hepp
+         |     ${showSourceOfMayhemCalled(s, 40)} hepp
+         |     ${showPendingRequests(s, 40)} hepp
          |
          |           __   Success                                                                                   __  call / raise circuit open
          |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
@@ -53,4 +60,19 @@ object Static {
          |""".stripMargin
   )
 
+  private def showPendingRequests(s: StatisticsInfo, width: Int) = {
+    constantWidth(s"Pending requests: ${s.pendingRequests}", width)
+  }
+
+  private def showSourceOfMayhemCalled(s: StatisticsInfo, width: Int) = {
+    constantWidth(s"SourceOfMayhem called last second: ${s.sentSinceLastReport}", width)
+  }
+
+  private def showProgramCalled(s: StatisticsInfo, width: Int) = {
+    constantWidth(s"Program called last second: ${s.programCalledSinceLastReport}", width)
+  }
+
+  private def showCircuitBreakerState(s: StatisticsInfo, width: Int) = {
+    constantWidth(s"The Circuit breaker is ${s.circuitBreakerState.toString}", width)
+  }
 }
