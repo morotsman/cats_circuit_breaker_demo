@@ -91,6 +91,14 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         state.modify(s => (s.copy(
           previousInput = Option(input)
         ), s))
+      case Character(c) if c == 'l' =>
+        state.modify(s => (s.copy(
+          previousInput = Option(input)
+        ), s))
+      case Character(c) if c == 't' =>
+        state.modify(s => (s.copy(
+          previousInput = Option(input)
+        ), s))
       case Character(c) if c == '+' =>
         for {
           s <- state.get

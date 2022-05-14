@@ -29,11 +29,7 @@ final case class CircuitBreakerSlide[F[_] : Temporal : MonadError[*[_], Throwabl
 ) extends Slide[F] {
 
   override def start(): F[Unit] = for {
-    sourceOfMayhem <- Ref[F].of(MayhemState(
-      isFailing = false,
-      successLatency = 30.millis,
-      requestTimeout = 5.seconds
-    )).map(SourceOfMayhem.make[F])
+    sourceOfMayhem <- Ref[F].of(MayhemState.make()).map(SourceOfMayhem.make[F])
     statistics <- Ref[F].of(StatisticsInfo.make()).map(Statistics.make[F])
     configuration = CircuitBreakerConfiguration.make()
     demoProgram <- CircuitBreaker.of[F](

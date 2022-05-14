@@ -41,7 +41,7 @@ object Static {
            |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
            |  ${toggleFailure(isFailing, 38)}                | |                                         | |                    \|_|/
            |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
-           |  Success latency: l +/-                                | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
+           |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
            |  Timeout: t +/-                                        | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
            |  Failure threshold: a +/-                              | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
            |  Reset timeout: r +/-                                  |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
@@ -62,9 +62,15 @@ object Static {
     if (!isFailing) constantWidth("Toggle fail: f", width)
     else constantWidth(ANSI_GREEN + "Toggle fail: f" + ANSI_RESET, width + 9)
 
-  private def numberOfRequests(previousInput: Option[Input], width: Int): String =
-    previousInput.fold(constantWidth("Number of requests: n +/-", width)) { input =>
-      constantWidth(s"Number of requests: ${if (input == Character('n')) (ANSI_GREEN + "n" + ANSI_RESET) else "n"} +/-", width + 9)
+  private def numberOfRequests(previousInput: Option[Input], width: Int): String = {
+    previousInput.filter(_ == Character('n')).fold(constantWidth("Number of requests: n +/-", width)) { _ =>
+      constantWidth(s"Number of requests: ${ANSI_GREEN + "n" + ANSI_RESET} +/-", width + 9)
+    }
+  }
+
+  private def successLatency(previousInput: Option[Input], width: Int): String =
+    previousInput.filter(_ == Character('l')).fold(constantWidth("Success latency: l +/-", width)) { _ =>
+      constantWidth(s"Success latency: ${ANSI_GREEN + "l" + ANSI_RESET} +/-", width + 9)
     }
 
   private def showAverageProgramCallTime(s: StatisticsInfo, width: Int) =

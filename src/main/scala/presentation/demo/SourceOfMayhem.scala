@@ -1,28 +1,40 @@
 package com.github.morotsman
 package presentation.demo
 
-import cats._
 import cats.implicits._
-import cats.{FlatMap, MonadError}
+import cats.MonadError
 import cats.effect.{Ref, Temporal}
 
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.duration.DurationLong
 
 trait SourceOfMayhem[F[_]] {
   def mightFail(): F[Unit]
 
   def toggleFailure(): F[Unit]
 
-  def setSuccessLatency(duration: FiniteDuration): F[Unit]
+  def increaseSuccessLatency(): F[Unit]
 
-  def setRequestTimeout(duration: FiniteDuration): F[Unit]
+  def decreaseSuccessLatency(): F[Unit]
+
+  def increaseRequestTimeout(): F[Unit]
+
+  def decreaseRequestTimeout(): F[Unit]
 }
 
 final case class MayhemState(
                               isFailing: Boolean,
-                              successLatency: FiniteDuration,
-                              requestTimeout: FiniteDuration
+                              successLatencyInMillis: Long,
+                              requestTimeoutInMillis: Long
                             )
+
+object MayhemState {
+
+  def make(): MayhemState = MayhemState(
+    isFailing = false,
+    successLatencyInMillis = 30,
+    requestTimeoutInMillis = 1000
+  )
+}
 
 object SourceOfMayhem {
 
@@ -31,20 +43,26 @@ object SourceOfMayhem {
       override def mightFail(): F[Unit] = for {
         currentState <- state.get
         _ <- if (!currentState.isFailing) {
-          Temporal[F].sleep(currentState.successLatency) >> MonadError[F, Throwable].unit
+          Temporal[F].sleep(currentState.successLatencyInMillis.millis) >> MonadError[F, Throwable].unit
         } else {
-          Temporal[F].sleep(currentState.requestTimeout) >> MonadError[F, Throwable].raiseError(new RuntimeException("Boooom"))
+          Temporal[F].sleep(currentState.requestTimeoutInMillis.millis) >> MonadError[F, Throwable].raiseError(new RuntimeException("Boooom"))
         }
       } yield ()
 
       override def toggleFailure(): F[Unit] =
         state.modify(s => (s.copy(isFailing = !s.isFailing), s))
 
-      override def setSuccessLatency(successLatency: FiniteDuration): F[Unit] =
-        state.modify(s => (s.copy(successLatency = successLatency), s))
+      override def increaseSuccessLatency(): F[Unit] =
+        state.modify(s => (s.copy(successLatencyInMillis = s.successLatencyInMillis * 2), s))
 
-      override def setRequestTimeout(requestTimeout: FiniteDuration): F[Unit] =
-        state.modify(s => (s.copy(requestTimeout = requestTimeout), s))
+      override def increaseRequestTimeout(): F[Unit] =
+        state.modify(s => (s.copy(requestTimeoutInMillis = s.requestTimeoutInMillis * 2), s))
+
+      override def decreaseSuccessLatency(): F[Unit] =
+        state.modify(s => (s.copy(successLatencyInMillis = s.successLatencyInMillis * 2), s))
+
+      override def decreaseRequestTimeout(): F[Unit] =
+        state.modify(s => (s.copy(requestTimeoutInMillis = s.requestTimeoutInMillis * 2), s))
     }
 
 }
