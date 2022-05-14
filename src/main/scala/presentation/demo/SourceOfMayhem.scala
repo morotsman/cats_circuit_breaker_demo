@@ -28,7 +28,6 @@ final case class MayhemState(
                             )
 
 object MayhemState {
-
   def make(): MayhemState = MayhemState(
     isFailing = false,
     successLatencyInMillis = 30,

@@ -42,7 +42,7 @@ object Static {
            |  ${toggleFailure(isFailing, 38)}                | |                                         | |                    \|_|/
            |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
            |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
-           |  Timeout: t +/-                                        | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
+           |  ${timeout(p, 24)}                              | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
            |  Failure threshold: a +/-                              | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
            |  Reset timeout: r +/-                                  |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
            |  Max reset timeout: m +/-                                     Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
@@ -65,6 +65,12 @@ object Static {
   private def numberOfRequests(previousInput: Option[Input], width: Int): String = {
     previousInput.filter(_ == Character('n')).fold(constantWidth("Number of requests: n +/-", width)) { _ =>
       constantWidth(s"Number of requests: ${ANSI_GREEN + "n" + ANSI_RESET} +/-", width + 9)
+    }
+  }
+
+  private def timeout(previousInput: Option[Input], width: Int): String = {
+    previousInput.filter(_ == Character('t')).fold(constantWidth("Timeout: t +/- ", width)) { _ =>
+      constantWidth(s"Timeout: ${ANSI_GREEN + "t" + ANSI_RESET} +/-", width + 9)
     }
   }
 

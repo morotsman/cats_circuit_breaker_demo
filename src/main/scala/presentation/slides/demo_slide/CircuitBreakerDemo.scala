@@ -8,18 +8,18 @@ import cats.implicits._
 import presentation.demo.{DemoProgram, SourceOfMayhem, Statistics, StatisticsInfo}
 import presentation.tools.{Character, Input, NConsole, Slide}
 
-import com.github.morotsman.presentation.slides.demo_slide.animations.Static.staticAnimation
+import presentation.slides.demo_slide.animations.Static.staticAnimation
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 final case class CircuitBreakerConfiguration(
-                                    maxFailures: Int,
-                                    resetTimeout: FiniteDuration,
-                                    maxResetTimeout: FiniteDuration
-                                  )
+                                              maxFailures: Int,
+                                              resetTimeout: FiniteDuration,
+                                              maxResetTimeout: FiniteDuration
+                                            )
 
 object CircuitBreakerConfiguration {
-  def make():CircuitBreakerConfiguration =  CircuitBreakerConfiguration(
+  def make(): CircuitBreakerConfiguration = CircuitBreakerConfiguration(
     maxFailures = 5,
     resetTimeout = 3.seconds,
     maxResetTimeout = 30.seconds
@@ -27,7 +27,7 @@ object CircuitBreakerConfiguration {
 }
 
 final case class DemoConfiguration(
-                                  delayBetweenCallToSourceOfMayhemInNanos: Int
+                                    delayBetweenCallToSourceOfMayhemInNanos: Int
                                   )
 
 object DemoConfiguration {
@@ -114,6 +114,10 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                   s))
                 _ <- updateProgramExecutor()
               } yield ()
+            case Character(c) if c == 'l' && s.isStarted =>
+              sourceOfMayhem.increaseSuccessLatency()
+            case Character(c) if c == 't' && s.isStarted =>
+              sourceOfMayhem.increaseRequestTimeout()
             case _ =>
               Monad[F].unit
           }
@@ -122,7 +126,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         for {
           s <- state.get
           _ <- s.previousInput.traverse {
-            case Character(c) if c == 'n' =>
+            case Character(c) if c == 'n' && s.isStarted =>
               for {
                 _ <- state.modify(s => (s.copy(
                   demoConfiguration = s.demoConfiguration.copy(
@@ -133,6 +137,10 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                   s))
                 _ <- updateProgramExecutor()
               } yield ()
+            case Character(c) if c == 'l' && s.isStarted =>
+              sourceOfMayhem.decreaseSuccessLatency()
+            case Character(c) if c == 't' && s.isStarted =>
+              sourceOfMayhem.decreaseRequestTimeout()
             case _ =>
               Monad[F].unit
           }
