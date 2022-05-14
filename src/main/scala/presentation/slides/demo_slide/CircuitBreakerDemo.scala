@@ -45,7 +45,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   state: Ref[F, CircuitBreakerDemoState[F]]
 ) extends Slide[F] {
 
-  override def show(): F[Unit] = {
+  override def start(): F[Unit] = {
     for {
       animation <- animate(animation = staticAnimation).start
       statisticsPoller <- forever(1.seconds) {

@@ -5,7 +5,7 @@ import cats.effect.Sync
 import com.github.morotsman.presentation.tools.{Input, NConsole, Slide}
 
 case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
-  override def show(): F[Unit] = {
+  override def start(): F[Unit] = {
     val text =
       """
         |
