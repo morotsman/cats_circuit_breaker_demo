@@ -7,15 +7,6 @@ import com.github.morotsman.presentation.demo.StatisticsInfo
 
 object Static {
 
-  val tmp: () => String = () => "hepp"
-
-  def constantWidth(s: String, width: Int): String =
-    if (s.length > width) {
-      s.take(width)
-    } else if (s.length < width) {
-      s + (" " * (width - s.length))
-    } else s
-
   val staticAnimation = List(
     (s: StatisticsInfo) => raw"""
          |     ${showCircuitBreakerState(s, 40)} hepp
@@ -75,4 +66,11 @@ object Static {
   private def showCircuitBreakerState(s: StatisticsInfo, width: Int) = {
     constantWidth(s"The Circuit breaker is ${s.circuitBreakerState.toString}", width)
   }
+
+  def constantWidth(s: String, width: Int): String =
+    if (s.length > width) {
+      s.take(width)
+    } else if (s.length < width) {
+      s + (" " * (width - s.length))
+    } else s
 }
