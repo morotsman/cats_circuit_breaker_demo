@@ -142,10 +142,10 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
     Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
 
-  private def animate(frame: Int = 0, animation: List[StatisticsInfo => String]): F[Unit] = {
+  private def animate(frame: Int = 0, animation: List[(StatisticsInfo, Option[Input]) => String]): F[Unit] = {
     for {
       s <- state.get
-      _ <- console.writeString(animation(frame)(s.statisticsInfo)) >>
+      _ <- console.writeString(animation(frame)(s.statisticsInfo, s.previousInput)) >>
         Temporal[F].sleep(500.milli) >>
         console.clear() >>
         animate(if (frame < animation.size - 1) frame + 1 else 0, animation)
