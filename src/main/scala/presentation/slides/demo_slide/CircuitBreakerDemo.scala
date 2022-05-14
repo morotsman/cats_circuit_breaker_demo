@@ -39,7 +39,7 @@ object DemoConfiguration {
 case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 (
   console: NConsole[F],
-  demoProgramFactory: (CircuitBreakerConfiguration, SourceOfMayhem[F], Statistics[F]) => F[DemoProgram[F]],
+  demoProgram: DemoProgram[F],
   sourceOfMayhem: SourceOfMayhem[F],
   statistics: Statistics[F],
   state: Ref[F, CircuitBreakerDemoState[F]]
@@ -56,11 +56,6 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
           ), s))
         } yield ()
       }.start
-      demoProgram <- demoProgramFactory(
-        CircuitBreakerConfiguration.make(),
-        sourceOfMayhem,
-        statistics
-      )
       _ <- {
         state.modify(s => (s.copy(
           currentAnimation = Option(animation),
@@ -100,7 +95,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         for {
           s <- state.get
           _ <- s.previousInput.traverse {
-            case Character(c) if c == 'n' =>
+            case Character(c) if c == 'n' && s.isStarted =>
               for {
                 _ <- state.modify(s => (s.copy(
                   demoConfiguration = s.demoConfiguration.copy(

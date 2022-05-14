@@ -56,7 +56,7 @@ final case class CircuitBreakerSlide[F[_] : Temporal : MonadError[*[_], Throwabl
       .of(CircuitBreakerDemoState.initial[F]())
       .map(CircuitBreakerDemo[F](
         console = console,
-        demoProgramFactory = (a, b, c) => MonadError[F, Throwable].pure(demoProgram),
+        demoProgram = demoProgram,
         sourceOfMayhem = sourceOfMayhem,
         statistics = statistics,
         _
