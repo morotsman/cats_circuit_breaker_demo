@@ -13,20 +13,6 @@ import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-final case class CircuitBreakerConfiguration(
-                                              maxFailures: Int,
-                                              resetTimeout: FiniteDuration,
-                                              maxResetTimeout: FiniteDuration
-                                            )
-
-object CircuitBreakerConfiguration {
-  def make(): CircuitBreakerConfiguration = CircuitBreakerConfiguration(
-    maxFailures = 5,
-    resetTimeout = 3.seconds,
-    maxResetTimeout = 30.seconds
-  )
-}
-
 final case class DemoConfiguration(
                                     delayBetweenCallToSourceOfMayhemInNanos: Int
                                   )
@@ -47,6 +33,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 
   override def start(): F[Unit] = {
     for {
+      s <- state.get
       animation <- animate(animation = staticAnimation).start
       statisticsPoller <- forever(1.seconds) {
         for {
@@ -56,12 +43,11 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
           ), s))
         } yield ()
       }.start
-      configuration = CircuitBreakerConfiguration.make()
       demoProgram <- CircuitBreaker.of[F](
-        maxFailures = configuration.maxFailures,
-        resetTimeout = configuration.resetTimeout,
+        maxFailures = s.circuitBreakerConfiguration.maxFailures,
+        resetTimeout = s.circuitBreakerConfiguration.resetTimeout,
         backoff = Backoff.exponential,
-        maxResetTimeout = configuration.maxResetTimeout,
+        maxResetTimeout = s.circuitBreakerConfiguration.maxResetTimeout,
         onOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.OPEN),
         onClosed = statistics.circuitBreakerStateChange(CircuitBreakerState.CLOSED),
         onRejected = MonadError[F, Throwable].unit,

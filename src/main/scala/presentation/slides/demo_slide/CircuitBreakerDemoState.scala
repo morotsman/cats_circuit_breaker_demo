@@ -5,6 +5,22 @@ import cats.effect.Fiber
 import presentation.demo.{DemoProgram, StatisticsInfo}
 import presentation.tools.Input
 
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+
+final case class CircuitBreakerConfiguration(
+                                              maxFailures: Int,
+                                              resetTimeout: FiniteDuration,
+                                              maxResetTimeout: FiniteDuration
+                                            )
+
+object CircuitBreakerConfiguration {
+  def make(): CircuitBreakerConfiguration = CircuitBreakerConfiguration(
+    maxFailures = 5,
+    resetTimeout = 3.seconds,
+    maxResetTimeout = 30.seconds
+  )
+}
+
 final case class CircuitBreakerDemoState[F[_]](
                                                 currentAnimation: Option[Fiber[F, Throwable, Unit]],
                                                 demoProgram: Option[DemoProgram[F]],
@@ -14,7 +30,8 @@ final case class CircuitBreakerDemoState[F[_]](
                                                 previousInput: Option[Input],
                                                 demoConfiguration: DemoConfiguration,
                                                 isFailing: Boolean,
-                                                isStarted: Boolean
+                                                isStarted: Boolean,
+                                                circuitBreakerConfiguration: CircuitBreakerConfiguration
                                               )
 
 object CircuitBreakerDemoState {
@@ -27,6 +44,7 @@ object CircuitBreakerDemoState {
     previousInput = None,
     demoConfiguration = DemoConfiguration.make(),
     isFailing = false,
-    isStarted = false
+    isStarted = false,
+    circuitBreakerConfiguration = CircuitBreakerConfiguration.make()
   )
 }
