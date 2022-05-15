@@ -94,6 +94,18 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         state.modify(s => (s.copy(
           previousInput = Option(input)
         ), s))
+      case Character(c) if c == 'a' =>
+        state.modify(s => (s.copy(
+          previousInput = Option(input)
+        ), s))
+      case Character(c) if c == 'r' =>
+        state.modify(s => (s.copy(
+          previousInput = Option(input)
+        ), s))
+      case Character(c) if c == 'm' =>
+        state.modify(s => (s.copy(
+          previousInput = Option(input)
+        ), s))
       case Character(c) if c == '+' =>
         for {
           s <- state.get
@@ -113,6 +125,19 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
               sourceOfMayhem.increaseSuccessLatency()
             case Character(c) if c == 't' =>
               sourceOfMayhem.increaseRequestTimeout()
+            case Character(c) if c == 'a' =>
+              for {
+                _ <- state.modify(s => (s.copy(
+                  circuitBreakerConfiguration = s.circuitBreakerConfiguration.copy(
+                    maxFailures = s.circuitBreakerConfiguration.maxFailures * 2
+                  )
+                ), s))
+                _ <- updateProgramExecutor()
+              } yield ()
+            case Character(c) if c == 'r' =>
+              ???
+            case Character(c) if c == 'm' =>
+              ???
             case _ =>
               Monad[F].unit
           }
@@ -136,6 +161,26 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
               sourceOfMayhem.decreaseSuccessLatency()
             case Character(c) if c == 't' =>
               sourceOfMayhem.decreaseRequestTimeout()
+            case Character(c) if c == 'a' =>
+              for {
+                _ <- state.modify(s => (s.copy(
+                  circuitBreakerConfiguration = s.circuitBreakerConfiguration.copy(
+                    maxFailures = {
+                      val max = s.circuitBreakerConfiguration.maxFailures / 2
+                      if (max >= 1) {
+                        max
+                      } else {
+                        1
+                      }
+                    }
+                  )
+                ), s))
+                _ <- updateProgramExecutor()
+              } yield ()
+            case Character(c) if c == 'r' =>
+              ???
+            case Character(c) if c == 'm' =>
+              ???
             case _ =>
               Monad[F].unit
           }
