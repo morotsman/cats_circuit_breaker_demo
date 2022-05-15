@@ -218,7 +218,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   private def animate(frame: Int = 0, animation: List[(StatisticsInfo, Option[Input], Boolean, MayhemState, CircuitBreakerConfiguration) => String]): F[Unit] = {
     for {
       s <- state.get
-      mayhemState <- sourceOfMayhem.mayhemState
+      mayhemState <- sourceOfMayhem.mayhemState()
       _ <- console.writeString(animation(frame)(
         s.statisticsInfo,
         s.previousInput,
