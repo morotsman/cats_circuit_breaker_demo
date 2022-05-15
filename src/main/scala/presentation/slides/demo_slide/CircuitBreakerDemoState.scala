@@ -2,9 +2,8 @@ package com.github.morotsman
 package presentation.slides.demo_slide
 
 import cats.effect.Fiber
-import com.github.morotsman.presentation.demo.CircuitBreakerState.CircuitBreakerState
-import com.github.morotsman.presentation.demo.{CircuitBreakerState, DemoProgram, StatisticsInfo}
-import com.github.morotsman.presentation.tools.Input
+import presentation.demo.{DemoProgram, StatisticsInfo}
+import presentation.tools.Input
 
 final case class CircuitBreakerDemoState[F[_]](
                                                 currentAnimation: Option[Fiber[F, Throwable, Unit]],
