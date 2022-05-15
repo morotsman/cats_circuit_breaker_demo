@@ -127,10 +127,14 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
               sourceOfMayhem.increaseRequestTimeout()
             case Character(c) if c == 'a' && s.isStarted =>
               for {
-                _ <- state.modify(s => (s.copy(
+                updatedState <- state.updateAndGet(s => s.copy(
                   circuitBreakerConfiguration = s.circuitBreakerConfiguration.copy(
                     maxFailures = s.circuitBreakerConfiguration.maxFailures * 2
                   )
+                ))
+                demoProgram <- createDemoProgram(updatedState.circuitBreakerConfiguration)
+                _ <- state.modify(s => (s.copy(
+                  demoProgram = Option(demoProgram)
                 ), s))
                 _ <- updateProgramExecutor()
               } yield ()
