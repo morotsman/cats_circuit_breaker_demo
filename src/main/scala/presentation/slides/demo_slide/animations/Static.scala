@@ -48,7 +48,7 @@ object Static {
            |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
            |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
            |  ${timeout(p, 24)}                              | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
-           |  Failure threshold: a +/-                              | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
+           |  ${threshold(p, 26)}                            | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
            |  Reset timeout: r +/-                                  |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
            |  Max reset timeout: m +/-                                     Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
            |                                                                                      | |  |_||_/_/ \_\____|_|    \___/|_| |___|_|\_|   | |
@@ -76,6 +76,12 @@ object Static {
   private def timeout(previousInput: Option[Input], width: Int): String = {
     previousInput.filter(_ == Character('t')).fold(constantWidth("Timeout: t +/- ", width)) { _ =>
       constantWidth(s"Timeout: ${ANSI_GREEN + "t" + ANSI_RESET} +/-", width + 9)
+    }
+  }
+
+  private def threshold(previousInput: Option[Input], width: Int): String = {
+    previousInput.filter(_ == Character('a')).fold(constantWidth("Failure threshold: a +/- ", width)) { _ =>
+      constantWidth(s"Failure threshold: ${ANSI_GREEN + "a" + ANSI_RESET} +/-", width + 9)
     }
   }
 
