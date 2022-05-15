@@ -19,7 +19,7 @@ object Main extends IOApp {
           slide
         )))
         .flatMap(Presentation.make[IO](console, _))
-      _ <- presentation.start().start
+      _ <- presentation.start()
       _ <- IO(handleInput(console, presentation)).flatten.foreverM
     } yield ()).map(_ => ExitCode.Success)
   }
