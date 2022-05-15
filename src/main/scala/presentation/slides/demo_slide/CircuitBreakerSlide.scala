@@ -29,7 +29,7 @@ final case class CircuitBreakerSlide[F[_] : Temporal : MonadError[*[_], Throwabl
     sourceOfMayhem <- Ref[F].of(MayhemState.make()).map(SourceOfMayhem.make[F])
     statistics <- Ref[F].of(StatisticsInfo.make()).map(Statistics.make[F])
     circuitBreakerDemoSlide <- Ref[F]
-      .of(CircuitBreakerDemoState.initial[F]())
+      .of(CircuitBreakerDemoState.make[F]())
       .map(CircuitBreakerDemo[F](
         console = console,
         sourceOfMayhem = sourceOfMayhem,

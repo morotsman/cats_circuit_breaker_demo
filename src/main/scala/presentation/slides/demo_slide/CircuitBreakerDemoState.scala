@@ -44,7 +44,7 @@ final case class CircuitBreakerDemoState[F[_]](
                                               )
 
 object CircuitBreakerDemoState {
-  def initial[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
+  def make[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
     currentAnimation = None,
     demoProgram = None,
     demoProgramExecutor = None,
