@@ -33,22 +33,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
           ), s))
         } yield ()
       }.start
-      demoProgram <- CircuitBreaker.of[F](
-        maxFailures = s.circuitBreakerConfiguration.maxFailures,
-        resetTimeout = s.circuitBreakerConfiguration.resetTimeout,
-        backoff = Backoff.exponential,
-        maxResetTimeout = s.circuitBreakerConfiguration.maxResetTimeout,
-        onOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.OPEN),
-        onClosed = statistics.circuitBreakerStateChange(CircuitBreakerState.CLOSED),
-        onRejected = MonadError[F, Throwable].unit,
-        onHalfOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.HALF_OPEN)
-      ).map { circuitBreaker =>
-        DemoProgram[F](
-          sourceOfMayhem = sourceOfMayhem,
-          circuitBreaker = circuitBreaker,
-          statistics = statistics
-        )
-      }
+      demoProgram <- createDemoProgram(s.circuitBreakerConfiguration)
       _ <- {
         state.modify(s => (s.copy(
           currentAnimation = Option(animation),
@@ -57,8 +42,25 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         ), s))
       }
     } yield ()
-
   }
+
+  private def createDemoProgram(circuitBreakerConfiguration: CircuitBreakerConfiguration): F[DemoProgram[F]] =
+    CircuitBreaker.of[F](
+      maxFailures = circuitBreakerConfiguration.maxFailures,
+      resetTimeout = circuitBreakerConfiguration.resetTimeout,
+      backoff = Backoff.exponential,
+      maxResetTimeout = circuitBreakerConfiguration.maxResetTimeout,
+      onOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.OPEN),
+      onClosed = statistics.circuitBreakerStateChange(CircuitBreakerState.CLOSED),
+      onRejected = MonadError[F, Throwable].unit,
+      onHalfOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.HALF_OPEN)
+    ).map { circuitBreaker =>
+      DemoProgram[F](
+        sourceOfMayhem = sourceOfMayhem,
+        circuitBreaker = circuitBreaker,
+        statistics = statistics
+      )
+    }
 
   override def userInput(input: Input): F[Unit] = for {
     _ <- input match {
