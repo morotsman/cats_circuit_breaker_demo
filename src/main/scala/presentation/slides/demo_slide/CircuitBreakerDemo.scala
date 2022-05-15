@@ -185,25 +185,6 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                 ), s))
                 _ <- updateProgramExecutor()
               } yield ()
-
-
-
-
-              for {
-                _ <- state.modify(s => (s.copy(
-                  circuitBreakerConfiguration = s.circuitBreakerConfiguration.copy(
-                    maxFailures = {
-                      val max = s.circuitBreakerConfiguration.maxFailures / 2
-                      if (max >= 1) {
-                        max
-                      } else {
-                        1
-                      }
-                    }
-                  )
-                ), s))
-                _ <- updateProgramExecutor()
-              } yield ()
             case Character(c) if c == 'r' =>
               ???
             case Character(c) if c == 'm' =>
