@@ -6,10 +6,7 @@ import presentation.tools.{Input, NConsole, Slide}
 import cats.implicits._
 import cats.MonadError
 import cats.effect.{Ref, Temporal}
-import com.github.morotsman.presentation.demo.{CircuitBreakerState, DemoProgram, MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
-import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
-
-import scala.concurrent.duration.DurationInt
+import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
 
 final case class CircuitBreakerSlideState[F[_]]
 (
@@ -31,28 +28,10 @@ final case class CircuitBreakerSlide[F[_] : Temporal : MonadError[*[_], Throwabl
   override def start(): F[Unit] = for {
     sourceOfMayhem <- Ref[F].of(MayhemState.make()).map(SourceOfMayhem.make[F])
     statistics <- Ref[F].of(StatisticsInfo.make()).map(Statistics.make[F])
-    configuration = CircuitBreakerConfiguration.make()
-    demoProgram <- CircuitBreaker.of[F](
-      maxFailures = configuration.maxFailures,
-      resetTimeout = configuration.resetTimeout,
-      backoff = Backoff.exponential,
-      maxResetTimeout = configuration.maxResetTimeout,
-      onOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.OPEN),
-      onClosed = statistics.circuitBreakerStateChange(CircuitBreakerState.CLOSED),
-      onRejected = MonadError[F, Throwable].unit,
-      onHalfOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.HALF_OPEN)
-    ).map { circuitBreaker =>
-      DemoProgram[F](
-        sourceOfMayhem = sourceOfMayhem,
-        circuitBreaker = circuitBreaker,
-        statistics = statistics
-      )
-    }
     circuitBreakerDemoSlide <- Ref[F]
       .of(CircuitBreakerDemoState.initial[F]())
       .map(CircuitBreakerDemo[F](
         console = console,
-        demoProgram = demoProgram,
         sourceOfMayhem = sourceOfMayhem,
         statistics = statistics,
         _

@@ -5,9 +5,11 @@ import cats._
 import cats.effect._
 import cats.effect.implicits._
 import cats.implicits._
-import presentation.demo.{DemoProgram, MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
+import presentation.demo.{CircuitBreakerState, DemoProgram, MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
 import presentation.tools.{Character, Input, NConsole, Slide}
 import presentation.slides.demo_slide.animations.Static.staticAnimation
+
+import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -38,7 +40,6 @@ object DemoConfiguration {
 case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 (
   console: NConsole[F],
-  demoProgram: DemoProgram[F],
   sourceOfMayhem: SourceOfMayhem[F],
   statistics: Statistics[F],
   state: Ref[F, CircuitBreakerDemoState[F]]
@@ -55,6 +56,23 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
           ), s))
         } yield ()
       }.start
+      configuration = CircuitBreakerConfiguration.make()
+      demoProgram <- CircuitBreaker.of[F](
+        maxFailures = configuration.maxFailures,
+        resetTimeout = configuration.resetTimeout,
+        backoff = Backoff.exponential,
+        maxResetTimeout = configuration.maxResetTimeout,
+        onOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.OPEN),
+        onClosed = statistics.circuitBreakerStateChange(CircuitBreakerState.CLOSED),
+        onRejected = MonadError[F, Throwable].unit,
+        onHalfOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.HALF_OPEN)
+      ).map { circuitBreaker =>
+        DemoProgram[F](
+          sourceOfMayhem = sourceOfMayhem,
+          circuitBreaker = circuitBreaker,
+          statistics = statistics
+        )
+      }
       _ <- {
         state.modify(s => (s.copy(
           currentAnimation = Option(animation),
