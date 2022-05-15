@@ -3,18 +3,24 @@ package presentation.slides.demo_slide.animations
 
 import presentation.demo.{MayhemState, StatisticsInfo}
 import presentation.tools.{Character, Input}
-
 import presentation.util.Colors.{ANSI_GREEN, ANSI_RESET}
+import presentation.slides.demo_slide.CircuitBreakerConfiguration
 
 object Static {
 
   val staticAnimation = List(
-    (s: StatisticsInfo, p: Option[Input], isStarted: Boolean, mayhemState: MayhemState) =>
+    (
+      s: StatisticsInfo,
+      p: Option[Input],
+      isStarted: Boolean,
+      mayhemState: MayhemState,
+      circuitBreakerConfiguration: CircuitBreakerConfiguration
+    ) =>
       raw"""
-           |     ${showCircuitBreakerState(s, 40)} ${showSuccessLatency(mayhemState, 40)} ${showRequestTimeout(mayhemState, 40)}
-           |     ${showProgramCalled(s, 40)} ${showAverageProgramCallTime(s, 40)}
-           |     ${showSourceOfMayhemCalled(s, 40)} ${showAverageSourceOfMayhemCallTime(s, 40)}
-           |     ${showPendingRequests(s, 40)}
+           |     ${showCircuitBreakerState(s, 40)} ${showSuccessLatency(mayhemState, 40)} ${showProgramCalled(s, 40)} ${showAverageProgramCallTime(s, 40)}
+           |     ${showThreshold(circuitBreakerConfiguration, 40)} ${showRequestTimeout(mayhemState, 40)} ${showSourceOfMayhemCalled(s, 40)} ${showAverageSourceOfMayhemCallTime(s, 40)}
+           |     ${showResetTimeout(circuitBreakerConfiguration, 40)} ${showPendingRequests(s, 40)}
+           |     ${showMaxResetTimeout(circuitBreakerConfiguration, 40)}
            |
            |           __   Success                                                                                   __  call / raise circuit open
            |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
@@ -109,6 +115,15 @@ object Static {
 
   private def showCircuitBreakerState(s: StatisticsInfo, width: Int) =
     constantWidth(s"The Circuit breaker is ${s.circuitBreakerState.toString}", width)
+
+  private def showThreshold(s: CircuitBreakerConfiguration, width: Int) =
+    constantWidth(s"Threshold:  ${s.maxFailures} failure", width)
+
+  private def showResetTimeout(s: CircuitBreakerConfiguration, width: Int) =
+    constantWidth(s"Reset timeout:  ${s.resetTimeout.toSeconds} s", width)
+
+  private def showMaxResetTimeout(s: CircuitBreakerConfiguration, width: Int) =
+    constantWidth(s"Max reset timeout:  ${s.maxResetTimeout.toSeconds} s", width)
 
   def constantWidth(s: String, width: Int): String =
     if (s.length > width) {

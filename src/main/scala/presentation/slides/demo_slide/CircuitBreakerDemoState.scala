@@ -24,7 +24,7 @@ final case class CircuitBreakerConfiguration(
 
 object CircuitBreakerConfiguration {
   def make(): CircuitBreakerConfiguration = CircuitBreakerConfiguration(
-    maxFailures = 5,
+    maxFailures = 4,
     resetTimeout = 3.seconds,
     maxResetTimeout = 30.seconds
   )

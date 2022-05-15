@@ -125,7 +125,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
               sourceOfMayhem.increaseSuccessLatency()
             case Character(c) if c == 't' =>
               sourceOfMayhem.increaseRequestTimeout()
-            case Character(c) if c == 'a' =>
+            case Character(c) if c == 'a' && s.isStarted =>
               for {
                 _ <- state.modify(s => (s.copy(
                   circuitBreakerConfiguration = s.circuitBreakerConfiguration.copy(
@@ -161,7 +161,7 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
               sourceOfMayhem.decreaseSuccessLatency()
             case Character(c) if c == 't' =>
               sourceOfMayhem.decreaseRequestTimeout()
-            case Character(c) if c == 'a' =>
+            case Character(c) if c == 'a' && s.isStarted =>
               for {
                 _ <- state.modify(s => (s.copy(
                   circuitBreakerConfiguration = s.circuitBreakerConfiguration.copy(
@@ -207,11 +207,17 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
     Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
 
-  private def animate(frame: Int = 0, animation: List[(StatisticsInfo, Option[Input], Boolean, MayhemState) => String]): F[Unit] = {
+  private def animate(frame: Int = 0, animation: List[(StatisticsInfo, Option[Input], Boolean, MayhemState, CircuitBreakerConfiguration) => String]): F[Unit] = {
     for {
       s <- state.get
       mayhemState <- sourceOfMayhem.mayhemState
-      _ <- console.writeString(animation(frame)(s.statisticsInfo, s.previousInput, s.isStarted, mayhemState)) >>
+      _ <- console.writeString(animation(frame)(
+        s.statisticsInfo,
+        s.previousInput,
+        s.isStarted,
+        mayhemState,
+        s.circuitBreakerConfiguration
+      )) >>
         Temporal[F].sleep(500.milli) >>
         console.clear() >>
         animate(if (frame < animation.size - 1) frame + 1 else 0, animation)
