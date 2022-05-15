@@ -13,16 +13,6 @@ import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-final case class DemoConfiguration(
-                                    delayBetweenCallToSourceOfMayhemInNanos: Int
-                                  )
-
-object DemoConfiguration {
-  def make(): DemoConfiguration = DemoConfiguration(
-    delayBetweenCallToSourceOfMayhemInNanos = 1000 * 1000 * 1000
-  )
-}
-
 case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
 (
   console: NConsole[F],

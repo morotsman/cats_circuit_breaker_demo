@@ -4,8 +4,17 @@ package presentation.slides.demo_slide
 import cats.effect.Fiber
 import presentation.demo.{DemoProgram, StatisticsInfo}
 import presentation.tools.Input
-
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
+
+final case class DemoConfiguration(
+                                    delayBetweenCallToSourceOfMayhemInNanos: Int
+                                  )
+
+object DemoConfiguration {
+  def make(): DemoConfiguration = DemoConfiguration(
+    delayBetweenCallToSourceOfMayhemInNanos = 1000 * 1000 * 1000
+  )
+}
 
 final case class CircuitBreakerConfiguration(
                                               maxFailures: Int,
