@@ -2,9 +2,10 @@ package com.github.morotsman
 package presentation.slides.demo_slide.animations
 
 import presentation.demo.{MayhemState, StatisticsInfo}
-import presentation.tools.{Character, Input}
+import presentation.tools.Input
 import presentation.util.Colors.{ANSI_GREEN, ANSI_RESET}
 import presentation.slides.demo_slide.CircuitBreakerConfiguration
+import presentation.slides.demo_slide.animations.AnimationHelper._
 
 object Static {
 
@@ -59,94 +60,5 @@ object Static {
            |""".stripMargin
   )
 
-  private def startStop(isStarted: Boolean, width: Int): String =
-    if (!isStarted) constantWidth("Start/Stop: s", width)
-    else constantWidth(ANSI_GREEN + "Start/Stop: s" + ANSI_RESET, width + 9)
 
-  private def toggleFailure(mayhemState: MayhemState, width: Int): String =
-    if (!mayhemState.isFailing) constantWidth("Toggle fail: f", width)
-    else constantWidth(ANSI_GREEN + "Toggle fail: f" + ANSI_RESET, width + 9)
-
-  private def numberOfRequests(previousInput: Option[Input], width: Int): String = {
-    previousInput.filter(_ == Character('n')).fold(constantWidth("Number of requests: n +/-", width)) { _ =>
-      constantWidth(s"Number of requests: ${ANSI_GREEN + "n" + ANSI_RESET} +/-", width + 9)
-    }
-  }
-
-  private def timeout(previousInput: Option[Input], width: Int): String = {
-    previousInput.filter(_ == Character('t')).fold(constantWidth("Timeout: t +/- ", width)) { _ =>
-      constantWidth(s"Timeout: ${ANSI_GREEN + "t" + ANSI_RESET} +/-", width + 9)
-    }
-  }
-
-  private def threshold(previousInput: Option[Input], width: Int): String = {
-    previousInput.filter(_ == Character('a')).fold(constantWidth("Failure threshold: a +/- ", width)) { _ =>
-      constantWidth(s"Failure threshold: ${ANSI_GREEN + "a" + ANSI_RESET} +/-", width + 9)
-    }
-  }
-
-  private def resetTimeout(previousInput: Option[Input], width: Int): String = {
-    previousInput.filter(_ == Character('r')).fold(constantWidth("Reset timeout: r +/-", width)) { _ =>
-      constantWidth(s"Reset timeout: ${ANSI_GREEN + "r" + ANSI_RESET} +/-", width + 9)
-    }
-  }
-
-  private def maxResetTimeout(previousInput: Option[Input], width: Int): String = {
-    previousInput.filter(_ == Character('m')).fold(constantWidth("Max reset timeout: m +/- ", width)) { _ =>
-      constantWidth(s"Max reset timeout: ${ANSI_GREEN + "m" + ANSI_RESET} +/-", width + 9)
-    }
-  }
-
-  private def successLatency(previousInput: Option[Input], width: Int): String =
-    previousInput.filter(_ == Character('l')).fold(constantWidth("Success latency: l +/-", width)) { _ =>
-      constantWidth(s"Success latency: ${ANSI_GREEN + "l" + ANSI_RESET} +/-", width + 9)
-    }
-
-  private def showSuccessLatency(s: MayhemState, width: Int) =
-    constantWidth(s"Success latency: ${s.successLatencyInMillis} ms", width)
-
-  private def showRequestTimeout(s: MayhemState, width: Int) =
-    constantWidth(s"Request timeout: ${s.requestTimeoutInMillis} ms", width)
-
-  private def showAverageProgramCallTime(s: StatisticsInfo, width: Int) =
-    if (s.programCompletedIn.nonEmpty) {
-      constantWidth(s"Average time: ${s.programCompletedIn.sum / s.programCompletedIn.length} ms", width)
-    } else {
-      constantWidth(s"Average time: 0 ms", width)
-    }
-
-  private def showAverageSourceOfMayhemCallTime(s: StatisticsInfo, width: Int) =
-    if (s.requestsCompletedIn.nonEmpty) {
-      constantWidth(s"Average time: ${s.requestsCompletedIn.sum / s.requestsCompletedIn.length} ms", width)
-    } else {
-      constantWidth(s"Average time: 0 ms", width)
-    }
-
-  private def showPendingRequests(s: StatisticsInfo, width: Int) =
-    constantWidth(s"Pending requests: ${s.pendingRequests}", width)
-
-  private def showSourceOfMayhemCalled(s: StatisticsInfo, width: Int) =
-    constantWidth(s"SourceOfMayhem called last second: ${s.sentSinceLastReport}", width)
-
-  private def showProgramCalled(s: StatisticsInfo, width: Int) =
-    constantWidth(s"Program called last second: ${s.programCalledSinceLastReport}", width)
-
-  private def showCircuitBreakerState(s: StatisticsInfo, width: Int) =
-    constantWidth(s"The Circuit breaker is ${s.circuitBreakerState.toString}", width)
-
-  private def showThreshold(s: CircuitBreakerConfiguration, width: Int) =
-    constantWidth(s"Threshold:  ${s.maxFailures} failure", width)
-
-  private def showResetTimeout(s: CircuitBreakerConfiguration, width: Int) =
-    constantWidth(s"Reset timeout:  ${s.resetTimeout.toSeconds} s", width)
-
-  private def showMaxResetTimeout(s: CircuitBreakerConfiguration, width: Int) =
-    constantWidth(s"Max reset timeout:  ${s.maxResetTimeout.toSeconds} s", width)
-
-  def constantWidth(s: String, width: Int): String =
-    if (s.length > width) {
-      s.take(width)
-    } else if (s.length < width) {
-      s + (" " * (width - s.length))
-    } else s
 }
