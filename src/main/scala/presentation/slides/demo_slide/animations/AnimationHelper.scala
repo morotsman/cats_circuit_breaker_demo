@@ -50,45 +50,45 @@ object AnimationHelper {
       constantWidth(s"Success latency: ${ANSI_GREEN + "l" + ANSI_RESET} +/-", width + 9)
     }
 
-  def showSuccessLatency(s: MayhemState, width: Int) =
+  def showSuccessLatency(s: MayhemState, width: Int): String =
     constantWidth(s"Success latency: ${s.successLatencyInMillis} ms", width)
 
-  def showRequestTimeout(s: MayhemState, width: Int) =
+  def showRequestTimeout(s: MayhemState, width: Int): String =
     constantWidth(s"Request timeout: ${s.requestTimeoutInMillis} ms", width)
 
-  def showAverageProgramCallTime(s: StatisticsInfo, width: Int) =
+  def showAverageProgramCallTime(s: StatisticsInfo, width: Int): String =
     if (s.programCompletedIn.nonEmpty) {
       constantWidth(s"Average time: ${s.programCompletedIn.sum / s.programCompletedIn.length} ms", width)
     } else {
       constantWidth(s"Average time: 0 ms", width)
     }
 
-  def showAverageSourceOfMayhemCallTime(s: StatisticsInfo, width: Int) =
+  def showAverageSourceOfMayhemCallTime(s: StatisticsInfo, width: Int): String =
     if (s.requestsCompletedIn.nonEmpty) {
       constantWidth(s"Average time: ${s.requestsCompletedIn.sum / s.requestsCompletedIn.length} ms", width)
     } else {
       constantWidth(s"Average time: 0 ms", width)
     }
 
-  def showPendingRequests(s: StatisticsInfo, width: Int) =
+  def showPendingRequests(s: StatisticsInfo, width: Int): String =
     constantWidth(s"Pending requests: ${s.pendingRequests}", width)
 
-  def showSourceOfMayhemCalled(s: StatisticsInfo, width: Int) =
+  def showSourceOfMayhemCalled(s: StatisticsInfo, width: Int): String =
     constantWidth(s"SourceOfMayhem called last second: ${s.sentSinceLastReport}", width)
 
-  def showProgramCalled(s: StatisticsInfo, width: Int) =
+  def showProgramCalled(s: StatisticsInfo, width: Int): String =
     constantWidth(s"Program called last second: ${s.programCalledSinceLastReport}", width)
 
-  def showCircuitBreakerState(s: StatisticsInfo, width: Int) =
+  def showCircuitBreakerState(s: StatisticsInfo, width: Int): String =
     constantWidth(s"The Circuit breaker is ${s.circuitBreakerState.toString}", width)
 
-  def showThreshold(s: CircuitBreakerConfiguration, width: Int) =
+  def showThreshold(s: CircuitBreakerConfiguration, width: Int): String =
     constantWidth(s"Threshold:  ${s.maxFailures} failure", width)
 
-  def showResetTimeout(s: CircuitBreakerConfiguration, width: Int) =
+  def showResetTimeout(s: CircuitBreakerConfiguration, width: Int): String =
     constantWidth(s"Reset timeout:  ${s.resetTimeout.toSeconds} s", width)
 
-  def showMaxResetTimeout(s: CircuitBreakerConfiguration, width: Int) =
+  def showMaxResetTimeout(s: CircuitBreakerConfiguration, width: Int): String =
     constantWidth(s"Max reset timeout:  ${s.maxResetTimeout.toSeconds} s", width)
 
   private def constantWidth(s: String, width: Int): String =
