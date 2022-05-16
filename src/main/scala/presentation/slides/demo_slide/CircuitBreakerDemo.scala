@@ -10,6 +10,7 @@ import presentation.tools.{Character, Input, NConsole, Slide}
 import presentation.slides.demo_slide.animations.Static.staticAnimation
 
 import com.github.morotsman.presentation.slides.demo_slide.AnimationState._
+import com.github.morotsman.presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
 import com.github.morotsman.presentation.slides.demo_slide.animations.ClosedSuccess
 import com.github.morotsman.presentation.slides.demo_slide.animations.ClosedSuccess.ClosedSuccessAnimation
 import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
@@ -245,6 +246,10 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !s.isFailing
       ) {
         (CLOSED_SUCCEED, ClosedSuccessAnimation)
+      } else if (
+        s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && s.isFailing
+      ) {
+        (CLOSED_FAILING, ClosedFailureAnimation)
       } else {
         (NOT_STARTED, staticAnimation)
       }

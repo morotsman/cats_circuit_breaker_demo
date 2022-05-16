@@ -35,7 +35,7 @@ object CircuitBreakerConfiguration {
 
 object AnimationState extends Enumeration {
   type AnimationState = Value
-  val NOT_STARTED, CLOSED_SUCCEED  = Value
+  val NOT_STARTED, CLOSED_SUCCEED, CLOSED_FAILING  = Value
 }
 
 final case class CircuitBreakerDemoState[F[_]](
