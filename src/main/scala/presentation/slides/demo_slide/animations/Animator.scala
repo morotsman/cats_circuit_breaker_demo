@@ -26,47 +26,42 @@ object Animator {
     console: NConsole[F]
   ): F[Animator[F]] = Monad[F].pure(new Animator[F] {
     override def animate(): F[Unit] = {
-      def animate(frame: Int): F[Unit] = {
-        for {
-          s <- state.get
-          mayhemState <- sourceOfMayhem.mayhemState()
-          animationState = if (
-            s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !s.isFailing
-          ) {
-            CLOSED_SUCCEED
-          } else if (
-            s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && s.isFailing
-          ) {
-            CLOSED_FAILING
-          } else {
-            NOT_STARTED
-          }
-          updated <- if (s.animationState != animationState) {
-            state.modify(s => (s.copy(
-              animationState = animationState
-            ), s)).map(_ => true)
-          } else {
-            Monad[F].pure(false)
-          }
-          frameToShow = if (updated) 0 else frame
-          animation = AnimationMapper(animationState)
-          _ <- console.writeString(
-            animation(frameToShow)(
-              s.statisticsInfo,
-              s.previousInput,
-              s.isStarted,
-              mayhemState,
-              s.circuitBreakerConfiguration
-            )) >>
-            Temporal[F].sleep(500.milli) >>
-            console.clear() >>
-            animate(if (frameToShow < animation.size - 1) frameToShow + 1 else 0)
+      def animate(frame: Int): F[Unit] = for {
+        s <- state.get
+        mayhemState <- sourceOfMayhem.mayhemState()
+        animationState = if (
+          s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !s.isFailing
+        ) {
+          CLOSED_SUCCEED
+        } else if (
+          s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && s.isFailing
+        ) {
+          CLOSED_FAILING
+        } else {
+          NOT_STARTED
         }
-
-        yield ()
-      }
-
-
+        updated <- if (s.animationState != animationState) {
+          state.modify(s => (s.copy(
+            animationState = animationState
+          ), s)).map(_ => true)
+        } else {
+          Monad[F].pure(false)
+        }
+        frameToShow = if (updated) 0 else frame
+        animation = AnimationMapper(animationState)
+        _ <- console.writeString(
+          animation(frameToShow)(
+            s.statisticsInfo,
+            s.previousInput,
+            s.isStarted,
+            mayhemState,
+            s.circuitBreakerConfiguration
+          )) >>
+          Temporal[F].sleep(500.milli) >>
+          console.clear() >>
+          animate(if (frameToShow < animation.size - 1) frameToShow + 1 else 0)
+      } yield ()
+      
       animate(0)
     }
   })
