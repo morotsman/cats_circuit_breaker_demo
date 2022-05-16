@@ -56,18 +56,4 @@ object Static {
              |""".stripMargin
   )
 
-  def showRuntimeInfo(
-                       s: StatisticsInfo,
-                       mayhemState: MayhemState,
-                       circuitBreakerConfiguration: CircuitBreakerConfiguration
-                     ) =
-    raw"""
-         |     ${showCircuitBreakerState(s, 40)} ${showSuccessLatency(mayhemState, 40)} ${showProgramCalled(s, 40)} ${showAverageProgramCallTime(s, 40)}
-         |     ${showThreshold(circuitBreakerConfiguration, 40)} ${showRequestTimeout(mayhemState, 40)} ${showSourceOfMayhemCalled(s, 40)} ${showAverageSourceOfMayhemCallTime(s, 40)}
-         |     ${showResetTimeout(circuitBreakerConfiguration, 40)} ${showPendingRequests(s, 40)}
-         |     ${showMaxResetTimeout(circuitBreakerConfiguration, 40)}
-         |
-         |""".stripMargin
-
-
 }
