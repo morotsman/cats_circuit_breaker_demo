@@ -6,6 +6,8 @@ import presentation.slides.demo_slide.{CircuitBreakerSlide, CircuitBreakerSlideS
 import presentation.slides.{Agenda, Start}
 import presentation.tools.{Input, NConsole, Presentation, PresentationState}
 
+import cats.implicits.catsSyntaxTuple2Parallel
+
 object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
@@ -19,8 +21,10 @@ object Main extends IOApp {
           slide
         )))
         .flatMap(Presentation.make[IO](console, _))
-      _ <- presentation.start()
-      _ <- IO(handleInput(console, presentation)).flatten.foreverM
+      _ <- (
+        presentation.start(),
+        IO(handleInput(console, presentation)).flatten.foreverM
+        ).parTupled
     } yield ()).map(_ => ExitCode.Success)
   }
 
