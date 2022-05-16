@@ -2,14 +2,13 @@ package com.github.morotsman
 package presentation.slides.demo_slide.animations
 
 import cats.implicits._
-import cats.{FlatMap, Monad}
+import cats.Monad
 import cats.effect.{Ref, Temporal}
 import presentation.demo.{CircuitBreakerState, SourceOfMayhem}
 import presentation.slides.demo_slide.CircuitBreakerDemoState
-
-import com.github.morotsman.presentation.slides.demo_slide.animations.Animation.AnimationMapper
-import com.github.morotsman.presentation.slides.demo_slide.animations.Animation.AnimationState.{CLOSED_FAILING, CLOSED_SUCCEED, NOT_STARTED}
-import com.github.morotsman.presentation.tools.NConsole
+import presentation.slides.demo_slide.animations.Animation.AnimationMapper
+import presentation.slides.demo_slide.animations.Animation.AnimationState.{CLOSED_FAILING, CLOSED_SUCCEED, NOT_STARTED}
+import presentation.tools.NConsole
 
 import scala.concurrent.duration.DurationInt
 
@@ -61,7 +60,7 @@ object Animator {
           console.clear() >>
           animate(if (frameToShow < animation.size - 1) frameToShow + 1 else 0)
       } yield ()
-      
+
       animate(0)
     }
   })
