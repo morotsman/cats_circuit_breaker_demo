@@ -17,12 +17,8 @@ object Static {
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
+      showRuntimeInfo(s, mayhemState, circuitBreakerConfiguration) +
       raw"""
-           |     ${showCircuitBreakerState(s, 40)} ${showSuccessLatency(mayhemState, 40)} ${showProgramCalled(s, 40)} ${showAverageProgramCallTime(s, 40)}
-           |     ${showThreshold(circuitBreakerConfiguration, 40)} ${showRequestTimeout(mayhemState, 40)} ${showSourceOfMayhemCalled(s, 40)} ${showAverageSourceOfMayhemCallTime(s, 40)}
-           |     ${showResetTimeout(circuitBreakerConfiguration, 40)} ${showPendingRequests(s, 40)}
-           |     ${showMaxResetTimeout(circuitBreakerConfiguration, 40)}
-           |
            |           __   Success                                                                                   __  call / raise circuit open
            |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
            |       | < <___|___|___|___|___| |                                                                    | < <___|___|___|___|___| |
@@ -44,13 +40,13 @@ object Static {
            |        \_\                                             | |                                         | |                     | |
            |           fail (under threshold)                       | |                                         |_|                     |_|
            |                                                        | |                                         | |                     | |
-           |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
-           |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
-           |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
-           |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
-           |  ${timeout(p, 24)}                              | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
-           |  ${threshold(p, 26)}                            | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
-           |  ${resetTimeout(p, 29)}                         |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
+           |  ${startStop(isStarted, 34)}| |                                         | |                     | |
+           |  ${toggleFailure(mayhemState, 40)}| |                                         | |                    \|_|/
+           |  ${numberOfRequests(p, 33)}| |                                        fail                     \ /
+           |  ${successLatency(p, 31)}| |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
+           |  ${timeout(p, 24)}| |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
+           |  ${threshold(p, 26)}| |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
+           |  ${resetTimeout(p, 29)}|_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
            |  ${maxResetTimeout(p, 32)}                             Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
            |                                                                                      | |  |_||_/_/ \_\____|_|    \___/|_| |___|_|\_|   | |
            |                                                                                      |_|_ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
@@ -59,6 +55,19 @@ object Static {
            |
            |""".stripMargin
   )
+
+  def showRuntimeInfo(
+               s: StatisticsInfo,
+               mayhemState: MayhemState,
+               circuitBreakerConfiguration: CircuitBreakerConfiguration
+             ) =
+    raw"""
+         |     ${showCircuitBreakerState(s, 40)} ${showSuccessLatency(mayhemState, 40)} ${showProgramCalled(s, 40)} ${showAverageProgramCallTime(s, 40)}
+         |     ${showThreshold(circuitBreakerConfiguration, 40)} ${showRequestTimeout(mayhemState, 40)} ${showSourceOfMayhemCalled(s, 40)} ${showAverageSourceOfMayhemCallTime(s, 40)}
+         |     ${showResetTimeout(circuitBreakerConfiguration, 40)} ${showPendingRequests(s, 40)}
+         |     ${showMaxResetTimeout(circuitBreakerConfiguration, 40)}
+         |
+         |""".stripMargin
 
 
 }
