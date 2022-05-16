@@ -13,12 +13,12 @@ object Main extends IOApp {
   override def run(args: List[String]): IO[ExitCode] = {
     (for {
       console <- NConsole.make[IO]()
-      slide <- Ref[IO].of(CircuitBreakerSlideState.make[IO]()).map(CircuitBreakerSlide[IO](console, _))
+      circuitBreakerSlide <- Ref[IO].of(CircuitBreakerSlideState.make[IO]()).map(CircuitBreakerSlide[IO](console, _))
       presentation <- Ref[IO]
         .of(PresentationState.initialState(List(
           Start[IO](console),
           Agenda[IO](console),
-          slide
+          circuitBreakerSlide
         )))
         .flatMap(Presentation.make[IO](console, _))
       _ <- (
