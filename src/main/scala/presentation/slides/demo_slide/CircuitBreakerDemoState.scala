@@ -5,7 +5,7 @@ import cats.effect.Fiber
 import presentation.demo.{DemoProgram, StatisticsInfo}
 import presentation.tools.Input
 
-import com.github.morotsman.presentation.slides.demo_slide.AnimationState.{AnimationState, NOT_STARTED}
+import com.github.morotsman.presentation.slides.demo_slide.animations.Animation.AnimationState.{AnimationState, NOT_STARTED}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -33,13 +33,7 @@ object CircuitBreakerConfiguration {
   )
 }
 
-object AnimationState extends Enumeration {
-  type AnimationState = Value
-  val NOT_STARTED, CLOSED_SUCCEED, CLOSED_FAILING  = Value
-}
-
 final case class CircuitBreakerDemoState[F[_]](
-                                                currentAnimation: Option[Fiber[F, Throwable, Unit]],
                                                 demoProgram: Option[DemoProgram[F]],
                                                 demoProgramExecutor: Option[Fiber[F, Throwable, Unit]],
                                                 statisticsPoller: Option[Fiber[F, Throwable, Unit]],
@@ -54,7 +48,6 @@ final case class CircuitBreakerDemoState[F[_]](
 
 object CircuitBreakerDemoState {
   def make[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
-    currentAnimation = None,
     demoProgram = None,
     demoProgramExecutor = None,
     statisticsPoller = None,

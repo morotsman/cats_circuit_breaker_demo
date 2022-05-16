@@ -4,42 +4,53 @@ package presentation.slides.demo_slide
 import presentation.tools.{Input, NConsole, Slide}
 
 import cats.implicits._
-import cats.MonadError
-import cats.effect.{Ref, Temporal}
+import cats.effect.implicits._
+import cats.{Monad, MonadError}
+import cats.effect.{Fiber, Ref, Spawn, Temporal}
 import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
+
+import com.github.morotsman.presentation.slides.demo_slide.animations.Animator
 
 final case class CircuitBreakerSlideState[F[_]]
 (
-  slide: Option[CircuitBreakerDemo[F]]
+  slide: Option[CircuitBreakerDemo[F]],
+  animator: Option[Fiber[F, Throwable, Unit]]
 )
 
 object CircuitBreakerSlideState {
   def make[F[_]](): CircuitBreakerSlideState[F] = CircuitBreakerSlideState[F](
-    slide = None
+    slide = None,
+    animator = None
   )
 }
 
-final case class CircuitBreakerSlide[F[_] : Temporal : MonadError[*[_], Throwable]]
+final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
 (
   console: NConsole[F],
   state: Ref[F, CircuitBreakerSlideState[F]]
 ) extends Slide[F] {
 
-  override def start(): F[Unit] = for {
+  override def show(): F[Unit] = for {
     sourceOfMayhem <- Ref[F].of(MayhemState.make()).map(SourceOfMayhem.make[F])
     statistics <- Ref[F].of(StatisticsInfo.make()).map(Statistics.make[F])
-    circuitBreakerDemoSlide <- Ref[F]
+    circuitBreakerDemoState <- Ref[F]
       .of(CircuitBreakerDemoState.make[F]())
-      .map(CircuitBreakerDemo[F](
-        console = console,
-        sourceOfMayhem = sourceOfMayhem,
-        statistics = statistics,
-        _
-      ))
+    animator <- Animator.make[F](circuitBreakerDemoState, sourceOfMayhem, console)
+    circuitBreakerDemoSlide <- MonadError[F, Throwable].pure(CircuitBreakerDemo[F](
+      console = console,
+      sourceOfMayhem = sourceOfMayhem,
+      statistics = statistics,
+      state = circuitBreakerDemoState
+    ))
     _ <- state.modify(s => (s.copy(
       slide = Option(circuitBreakerDemoSlide)
     ), s))
-    _ <- circuitBreakerDemoSlide.start()
+    animator <- animator.animate().start
+    _ <- circuitBreakerDemoSlide.show()
+    _ <- state.modify(s => (s.copy(
+      slide = Option(circuitBreakerDemoSlide),
+      animator = Option(animator)
+    ), s))
   } yield ()
 
   override def userInput(input: Input): F[Unit] = for {
@@ -51,5 +62,6 @@ final case class CircuitBreakerSlide[F[_] : Temporal : MonadError[*[_], Throwabl
   override def exit(): F[Unit] = for {
     s <- state.get
     _ <- s.slide.traverse(_.exit())
+    _ <- s.animator.traverse(_.cancel)
   } yield ()
 }

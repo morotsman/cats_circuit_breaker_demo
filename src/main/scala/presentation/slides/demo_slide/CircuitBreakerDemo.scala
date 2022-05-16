@@ -7,11 +7,6 @@ import cats.effect.implicits._
 import cats.implicits._
 import presentation.demo.{CircuitBreakerState, DemoProgram, SourceOfMayhem, Statistics}
 import presentation.tools.{Character, Input, NConsole, Slide}
-import presentation.slides.demo_slide.animations.Static.staticAnimation
-
-import presentation.slides.demo_slide.AnimationState._
-import presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
-import presentation.slides.demo_slide.animations.ClosedSuccess.ClosedSuccessAnimation
 import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -24,10 +19,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   state: Ref[F, CircuitBreakerDemoState[F]]
 ) extends Slide[F] {
 
-  override def start(): F[Unit] = {
+  override def show(): F[Unit] = {
     for {
       s <- state.get
-      animation <- animate().start
       statisticsPoller <- forever(1.seconds) {
         for {
           info <- statistics.getStatisticsInfo()
@@ -39,7 +33,6 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
       demoProgram <- createDemoProgram(s.circuitBreakerConfiguration)
       _ <- {
         state.modify(s => (s.copy(
-          currentAnimation = Option(animation),
           statisticsPoller = Option(statisticsPoller),
           demoProgram = Option(demoProgram)
         ), s))
@@ -237,48 +230,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
     Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
 
-  private def animate(frame: Int = 0): F[Unit] = {
-    for {
-      s <- state.get
-      mayhemState <- sourceOfMayhem.mayhemState()
-      (animationState, animation) = if (
-        s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !s.isFailing
-      ) {
-        (CLOSED_SUCCEED, ClosedSuccessAnimation)
-      } else if (
-        s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && s.isFailing
-      ) {
-        (CLOSED_FAILING, ClosedFailureAnimation)
-      } else {
-        (NOT_STARTED, staticAnimation)
-      }
-      updated <- if (s.animationState != animationState) {
-        state.modify(s => (s.copy(
-          animationState = animationState
-        ), s)).map(_ => true)
-      } else {
-        Monad[F].pure(false)
-      }
-      frameToShow = if (updated) 0 else frame
-      _
-        <- console.writeString(animation(frameToShow)(
-        s.statisticsInfo,
-        s.previousInput,
-        s.isStarted,
-        mayhemState,
-        s.circuitBreakerConfiguration
-      )) >>
-        Temporal[F].sleep(500.milli) >>
-        console.clear() >>
-        animate(if (frameToShow < animation.size - 1) frameToShow + 1 else 0)
-    }
-
-    yield ()
-  }
 
   override def exit(): F[Unit] = for {
     s <- state.get
-    _ <- s.currentAnimation.traverse(_.cancel)
     _ <- s.demoProgramExecutor.traverse(_.cancel)
     _ <- s.statisticsPoller.traverse(_.cancel)
   } yield ()

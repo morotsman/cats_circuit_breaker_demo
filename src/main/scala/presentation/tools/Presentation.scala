@@ -37,7 +37,7 @@ object Presentation {
       override def start(): F[Unit] = for {
         _ <- console.clear()
         state <- state.get
-        _ <- state.slides.head.start()
+        _ <- state.slides.head.show()
       } yield ()
 
       override def nextSlide(): F[Unit] = for {
@@ -49,7 +49,7 @@ object Presentation {
             s.copy(slideIndex = s.slideIndex + 1)
           }
         )
-        _ <- state.slides(state.slideIndex).start()
+        _ <- state.slides(state.slideIndex).show()
       } yield ()
 
       override def previousSlide(): F[Unit] = for {
@@ -61,7 +61,7 @@ object Presentation {
             s
           }
         )
-        f <- state.slides(state.slideIndex).start()
+        f <- state.slides(state.slideIndex).show()
       } yield f
 
       override def exit(): F[Unit] = ???
