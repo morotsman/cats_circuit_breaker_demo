@@ -5,14 +5,13 @@ import cats._
 import cats.effect._
 import cats.effect.implicits._
 import cats.implicits._
-import presentation.demo.{CircuitBreakerState, DemoProgram, MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
+import presentation.demo.{CircuitBreakerState, DemoProgram, SourceOfMayhem, Statistics}
 import presentation.tools.{Character, Input, NConsole, Slide}
 import presentation.slides.demo_slide.animations.Static.staticAnimation
 
-import com.github.morotsman.presentation.slides.demo_slide.AnimationState._
-import com.github.morotsman.presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
-import com.github.morotsman.presentation.slides.demo_slide.animations.ClosedSuccess
-import com.github.morotsman.presentation.slides.demo_slide.animations.ClosedSuccess.ClosedSuccessAnimation
+import presentation.slides.demo_slide.AnimationState._
+import presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
+import presentation.slides.demo_slide.animations.ClosedSuccess.ClosedSuccessAnimation
 import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
