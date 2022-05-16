@@ -127,15 +127,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
               sourceOfMayhem.increaseRequestTimeout()
             case Character(c) if c == 'a' =>
               for {
-                updatedState <- state.updateAndGet(s => s.copy(
-                  circuitBreakerConfiguration = s.circuitBreakerConfiguration.copy(
-                    maxFailures = s.circuitBreakerConfiguration.maxFailures * 2
-                  )
+                _ <- updateCircuitBreakerConfiguration(_.copy(
+                  maxFailures = s.circuitBreakerConfiguration.maxFailures * 2
                 ))
-                demoProgram <- createDemoProgram(updatedState.circuitBreakerConfiguration)
-                _ <- state.modify(s => (s.copy(
-                  demoProgram = Option(demoProgram)
-                ), s))
                 _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
               } yield ()
             case Character(c) if c == 'r' =>
@@ -167,22 +161,16 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
               sourceOfMayhem.decreaseRequestTimeout()
             case Character(c) if c == 'a' =>
               for {
-                updatedState <- state.updateAndGet(s => s.copy(
-                  circuitBreakerConfiguration = s.circuitBreakerConfiguration.copy(
-                    maxFailures = {
-                      val max = s.circuitBreakerConfiguration.maxFailures / 2
-                      if (max >= 1) {
-                        max
-                      } else {
-                        1
-                      }
+                _ <- updateCircuitBreakerConfiguration(_.copy(
+                  maxFailures = {
+                    val max = s.circuitBreakerConfiguration.maxFailures / 2
+                    if (max >= 1) {
+                      max
+                    } else {
+                      1
                     }
-                  )
+                  }
                 ))
-                demoProgram <- createDemoProgram(updatedState.circuitBreakerConfiguration)
-                _ <- state.modify(s => (s.copy(
-                  demoProgram = Option(demoProgram)
-                ), s))
                 _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
               } yield ()
             case Character(c) if c == 'r' =>
@@ -198,6 +186,17 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
         Monad[F].unit
     }
   } yield true
+
+  private def updateCircuitBreakerConfiguration(modifier: CircuitBreakerConfiguration => CircuitBreakerConfiguration) =
+    for {
+      updatedState <- state.updateAndGet(s => s.copy(
+        circuitBreakerConfiguration = modifier(s.circuitBreakerConfiguration)
+      ))
+      demoProgram <- createDemoProgram(updatedState.circuitBreakerConfiguration)
+      _ <- state.modify(s => (s.copy(
+        demoProgram = Option(demoProgram)
+      ), s))
+    } yield ()
 
   private def updateProgramExecutor() = {
     for {
