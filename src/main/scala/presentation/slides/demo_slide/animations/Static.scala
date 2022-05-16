@@ -49,8 +49,8 @@ object Static {
            |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
            |  ${timeout(p, 24)}                              | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
            |  ${threshold(p, 26)}                            | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
-           |  Reset timeout: r +/-                                  |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
-           |  Max reset timeout: m +/-                                     Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
+           |  ${resetTimeout(p, 29)}                         |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
+           |  ${maxResetTimeout(p, 32)}                             Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
            |                                                                                      | |  |_||_/_/ \_\____|_|    \___/|_| |___|_|\_|   | |
            |                                                                                      |_|_ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
            |                                                                                      |___|___|___|___|___|___|___|___|___|___|___|___|___|
@@ -82,6 +82,18 @@ object Static {
   private def threshold(previousInput: Option[Input], width: Int): String = {
     previousInput.filter(_ == Character('a')).fold(constantWidth("Failure threshold: a +/- ", width)) { _ =>
       constantWidth(s"Failure threshold: ${ANSI_GREEN + "a" + ANSI_RESET} +/-", width + 9)
+    }
+  }
+
+  private def resetTimeout(previousInput: Option[Input], width: Int): String = {
+    previousInput.filter(_ == Character('r')).fold(constantWidth("Reset timeout: r +/-", width)) { _ =>
+      constantWidth(s"Reset timeout: ${ANSI_GREEN + "r" + ANSI_RESET} +/-", width + 9)
+    }
+  }
+
+  private def maxResetTimeout(previousInput: Option[Input], width: Int): String = {
+    previousInput.filter(_ == Character('m')).fold(constantWidth("Max reset timeout: m +/- ", width)) { _ =>
+      constantWidth(s"Max reset timeout: ${ANSI_GREEN + "m" + ANSI_RESET} +/-", width + 9)
     }
   }
 

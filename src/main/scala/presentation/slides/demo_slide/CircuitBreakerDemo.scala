@@ -133,9 +133,19 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                 _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
               } yield ()
             case Character(c) if c == 'r' =>
-              ???
+              for {
+                _ <- updateCircuitBreakerConfiguration(_.copy(
+                  resetTimeout = s.circuitBreakerConfiguration.resetTimeout * 2
+                ))
+                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
+              } yield ()
             case Character(c) if c == 'm' =>
-              ???
+              for {
+                _ <- updateCircuitBreakerConfiguration(_.copy(
+                  maxResetTimeout = s.circuitBreakerConfiguration.maxResetTimeout * 2
+                ))
+                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
+              } yield ()
             case _ =>
               Monad[F].unit
           }
@@ -174,9 +184,19 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
                 _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
               } yield ()
             case Character(c) if c == 'r' =>
-              ???
+              for {
+                _ <- updateCircuitBreakerConfiguration(_.copy(
+                  resetTimeout = s.circuitBreakerConfiguration.resetTimeout / 2
+                ))
+                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
+              } yield ()
             case Character(c) if c == 'm' =>
-              ???
+              for {
+                _ <- updateCircuitBreakerConfiguration(_.copy(
+                  maxResetTimeout = s.circuitBreakerConfiguration.maxResetTimeout / 2
+                ))
+                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
+              } yield ()
             case _ =>
               Monad[F].unit
           }
