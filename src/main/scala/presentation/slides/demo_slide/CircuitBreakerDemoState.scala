@@ -4,6 +4,9 @@ package presentation.slides.demo_slide
 import cats.effect.Fiber
 import presentation.demo.{DemoProgram, StatisticsInfo}
 import presentation.tools.Input
+
+import com.github.morotsman.presentation.slides.demo_slide.AnimationState.{AnimationState, NOT_STARTED}
+
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 final case class DemoConfiguration(
@@ -30,6 +33,11 @@ object CircuitBreakerConfiguration {
   )
 }
 
+object AnimationState extends Enumeration {
+  type AnimationState = Value
+  val NOT_STARTED, CLOSED_SUCCEED  = Value
+}
+
 final case class CircuitBreakerDemoState[F[_]](
                                                 currentAnimation: Option[Fiber[F, Throwable, Unit]],
                                                 demoProgram: Option[DemoProgram[F]],
@@ -40,7 +48,8 @@ final case class CircuitBreakerDemoState[F[_]](
                                                 demoConfiguration: DemoConfiguration,
                                                 isFailing: Boolean,
                                                 isStarted: Boolean,
-                                                circuitBreakerConfiguration: CircuitBreakerConfiguration
+                                                circuitBreakerConfiguration: CircuitBreakerConfiguration,
+                                                animationState: AnimationState
                                               )
 
 object CircuitBreakerDemoState {
@@ -54,6 +63,7 @@ object CircuitBreakerDemoState {
     demoConfiguration = DemoConfiguration.make(),
     isFailing = false,
     isStarted = false,
-    circuitBreakerConfiguration = CircuitBreakerConfiguration.make()
+    circuitBreakerConfiguration = CircuitBreakerConfiguration.make(),
+    animationState = NOT_STARTED
   )
 }
