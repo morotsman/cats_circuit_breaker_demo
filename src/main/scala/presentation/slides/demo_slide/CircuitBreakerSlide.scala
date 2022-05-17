@@ -5,11 +5,10 @@ import presentation.tools.{Input, NConsole, Slide}
 
 import cats.implicits._
 import cats.effect.implicits._
-import cats.{Monad, MonadError}
+import cats.Monad
 import cats.effect.{Fiber, Ref, Spawn, Temporal}
-import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsInfo, StatisticsState}
-
-import com.github.morotsman.presentation.slides.demo_slide.animations.{Animator, AnimatorState}
+import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsState}
+import presentation.slides.demo_slide.animations.{Animator, AnimatorState}
 
 final case class CircuitBreakerSlideState[F[_]]
 (
