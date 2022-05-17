@@ -7,20 +7,22 @@ import cats.implicits._
 import cats.effect.implicits._
 import cats.{Monad, MonadError}
 import cats.effect.{Fiber, Ref, Spawn, Temporal}
-import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsInfo}
+import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsInfo, StatisticsState}
 
 import com.github.morotsman.presentation.slides.demo_slide.animations.Animator
 
 final case class CircuitBreakerSlideState[F[_]]
 (
   slide: Option[CircuitBreakerDemo[F]],
-  animator: Option[Fiber[F, Throwable, Unit]]
+  animator: Option[Fiber[F, Throwable, Unit]],
+  statisticsAggregator: Option[Fiber[F, Throwable, Unit]],
 )
 
 object CircuitBreakerSlideState {
   def make[F[_]](): CircuitBreakerSlideState[F] = CircuitBreakerSlideState[F](
     slide = None,
-    animator = None
+    animator = None,
+    statisticsAggregator = None
   )
 }
 
@@ -32,10 +34,10 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
 
   override def show(): F[Unit] = for {
     sourceOfMayhem <- Ref[F].of(MayhemState.make()).map(SourceOfMayhem.make[F])
-    statistics <- Ref[F].of(StatisticsInfo.make()).map(Statistics.make[F])
+    statistics <- Ref[F].of(StatisticsState.make()).map(Statistics.make[F])
     circuitBreakerDemoState <- Ref[F]
       .of(CircuitBreakerDemoState.make[F]())
-    animator <- Animator.make[F](circuitBreakerDemoState, sourceOfMayhem, console)
+    animator <- Animator.make[F](circuitBreakerDemoState, statistics, sourceOfMayhem, console)
     circuitBreakerDemoSlide <- MonadError[F, Throwable].pure(CircuitBreakerDemo[F](
       console = console,
       sourceOfMayhem = sourceOfMayhem,
@@ -46,10 +48,12 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
       slide = Option(circuitBreakerDemoSlide)
     ), s))
     animator <- animator.animate().start
+    statisticsAggregator <- statistics.aggregate().start
     _ <- circuitBreakerDemoSlide.show()
     _ <- state.modify(s => (s.copy(
       slide = Option(circuitBreakerDemoSlide),
-      animator = Option(animator)
+      animator = Option(animator),
+      statisticsAggregator = Option(statisticsAggregator)
     ), s))
   } yield ()
 
@@ -63,5 +67,6 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
     s <- state.get
     _ <- s.slide.traverse(_.exit())
     _ <- s.animator.traverse(_.cancel)
+    _ <- s.statisticsAggregator.traverse(_.cancel)
   } yield ()
 }

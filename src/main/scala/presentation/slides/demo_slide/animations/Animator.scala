@@ -4,7 +4,7 @@ package presentation.slides.demo_slide.animations
 import cats.implicits._
 import cats.Monad
 import cats.effect.{Ref, Temporal}
-import presentation.demo.{CircuitBreakerState, SourceOfMayhem}
+import presentation.demo.{CircuitBreakerState, SourceOfMayhem, Statistics}
 import presentation.slides.demo_slide.CircuitBreakerDemoState
 import presentation.slides.demo_slide.animations.Animation.AnimationMapper
 import presentation.slides.demo_slide.animations.Animation.AnimationState.{CLOSED_FAILING, CLOSED_SUCCEED, NOT_STARTED}
@@ -21,19 +21,21 @@ object Animator {
   def make[F[_] : Monad : Temporal]
   (
     state: Ref[F, CircuitBreakerDemoState[F]],
+    statistics: Statistics[F],
     sourceOfMayhem: SourceOfMayhem[F],
     console: NConsole[F]
   ): F[Animator[F]] = Monad[F].pure(new Animator[F] {
     override def animate(): F[Unit] = {
       def animate(frame: Int): F[Unit] = for {
         s <- state.get
+        statisticsInfo <- statistics.getStatisticsInfo()
         mayhemState <- sourceOfMayhem.mayhemState()
         animationState = if (
-          s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !s.isFailing
+          s.isStarted && statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !s.isFailing
         ) {
           CLOSED_SUCCEED
         } else if (
-          s.isStarted && s.statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && s.isFailing
+          s.isStarted && statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && s.isFailing
         ) {
           CLOSED_FAILING
         } else {
@@ -50,7 +52,7 @@ object Animator {
         animation = AnimationMapper(animationState)
         _ <- console.writeString(
           animation(frameToShow)(
-            s.statisticsInfo,
+            statisticsInfo,
             s.previousInput,
             s.isStarted,
             mayhemState,

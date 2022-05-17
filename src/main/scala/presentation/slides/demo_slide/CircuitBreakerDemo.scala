@@ -22,18 +22,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   override def show(): F[Unit] = {
     for {
       s <- state.get
-      statisticsPoller <- forever(1.seconds) {
-        for {
-          info <- statistics.getStatisticsInfo()
-          _ <- state.modify(s => (s.copy(
-            statisticsInfo = info
-          ), s))
-        } yield ()
-      }.start
       demoProgram <- createDemoProgram(s.circuitBreakerConfiguration)
       _ <- {
         state.modify(s => (s.copy(
-          statisticsPoller = Option(statisticsPoller),
           demoProgram = Option(demoProgram)
         ), s))
       }
@@ -234,7 +225,6 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   override def exit(): F[Unit] = for {
     s <- state.get
     _ <- s.demoProgramExecutor.traverse(_.cancel)
-    _ <- s.statisticsPoller.traverse(_.cancel)
   } yield ()
 
 }

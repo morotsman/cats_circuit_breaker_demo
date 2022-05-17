@@ -2,10 +2,9 @@ package com.github.morotsman
 package presentation.slides.demo_slide
 
 import cats.effect.Fiber
-import presentation.demo.{DemoProgram, StatisticsInfo}
+import presentation.demo.DemoProgram
 import presentation.tools.Input
-
-import com.github.morotsman.presentation.slides.demo_slide.animations.Animation.AnimationState.{AnimationState, NOT_STARTED}
+import presentation.slides.demo_slide.animations.Animation.AnimationState.{AnimationState, NOT_STARTED}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -36,8 +35,6 @@ object CircuitBreakerConfiguration {
 final case class CircuitBreakerDemoState[F[_]](
                                                 demoProgram: Option[DemoProgram[F]],
                                                 demoProgramExecutor: Option[Fiber[F, Throwable, Unit]],
-                                                statisticsPoller: Option[Fiber[F, Throwable, Unit]],
-                                                statisticsInfo: StatisticsInfo,
                                                 previousInput: Option[Input],
                                                 demoConfiguration: DemoConfiguration,
                                                 isFailing: Boolean,
@@ -50,8 +47,6 @@ object CircuitBreakerDemoState {
   def make[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
     demoProgram = None,
     demoProgramExecutor = None,
-    statisticsPoller = None,
-    statisticsInfo = StatisticsInfo.make(),
     previousInput = None,
     demoConfiguration = DemoConfiguration.make(),
     isFailing = false,
