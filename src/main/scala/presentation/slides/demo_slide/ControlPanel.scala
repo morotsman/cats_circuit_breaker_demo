@@ -11,15 +11,15 @@ import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
+case class ControlPanel[F[_] : Monad : Temporal : Spawn]
 (
   console: NConsole[F],
   sourceOfMayhem: SourceOfMayhem[F],
   statistics: Statistics[F],
-  state: Ref[F, CircuitBreakerDemoState[F]]
+  state: Ref[F, ControlPanelState[F]]
 ) extends Slide[F] {
 
-  def getState(): F[CircuitBreakerDemoState[F]] =
+  def getState(): F[ControlPanelState[F]] =
     state.get
 
   override def show(): F[Unit] = {

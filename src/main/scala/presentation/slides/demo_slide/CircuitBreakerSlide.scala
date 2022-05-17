@@ -12,7 +12,7 @@ import presentation.slides.demo_slide.animations.{Animator, AnimatorState}
 
 final case class CircuitBreakerSlideState[F[_]]
 (
-  slide: Option[CircuitBreakerDemo[F]],
+  slide: Option[ControlPanel[F]],
   animator: Option[Fiber[F, Throwable, Unit]],
   statisticsAggregator: Option[Fiber[F, Throwable, Unit]],
 )
@@ -34,7 +34,7 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
   override def show(): F[Unit] = for {
     sourceOfMayhem <- Ref[F].of(MayhemState.make()).map(SourceOfMayhem.make[F])
     statistics <- Ref[F].of(StatisticsState.make()).map(Statistics.make[F])
-    circuitBreakerDemoSlide <- Ref[F].of(CircuitBreakerDemoState.make[F]()).map(state => CircuitBreakerDemo[F](
+    circuitBreakerDemoSlide <- Ref[F].of(ControlPanelState.make[F]()).map(state => ControlPanel[F](
       console = console,
       sourceOfMayhem = sourceOfMayhem,
       statistics = statistics,

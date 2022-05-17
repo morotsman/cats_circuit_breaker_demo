@@ -15,7 +15,7 @@ object DemoConfiguration {
   )
 }
 
-final case class CircuitBreakerDemoState[F[_]]
+final case class ControlPanelState[F[_]]
 (
   demoProgram: Option[DemoProgram[F]],
   demoProgramExecutor: Option[Fiber[F, Throwable, Unit]],
@@ -26,8 +26,8 @@ final case class CircuitBreakerDemoState[F[_]]
   circuitBreakerConfiguration: CircuitBreakerConfiguration
 )
 
-object CircuitBreakerDemoState {
-  def make[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
+object ControlPanelState {
+  def make[F[_]](): ControlPanelState[F] = ControlPanelState[F](
     demoProgram = None,
     demoProgramExecutor = None,
     previousInput = None,

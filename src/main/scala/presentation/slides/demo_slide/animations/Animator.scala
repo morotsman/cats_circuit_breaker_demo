@@ -5,7 +5,7 @@ import cats.implicits._
 import cats.Monad
 import cats.effect.{Ref, Temporal}
 import presentation.demo.{CircuitBreakerState, SourceOfMayhem, Statistics}
-import presentation.slides.demo_slide.{CircuitBreakerDemo, CircuitBreakerDemoState}
+import presentation.slides.demo_slide.{ControlPanel, ControlPanelState}
 import presentation.tools.NConsole
 import presentation.slides.demo_slide.animations.AnimationState.{AnimationMapper, AnimationState, CLOSED_FAILING, CLOSED_SUCCEED, NOT_STARTED}
 import presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
@@ -42,7 +42,7 @@ object Animator {
 
   def make[F[_] : Monad : Temporal]
   (
-    circuitBreakerDemo: CircuitBreakerDemo[F],
+    circuitBreakerDemo: ControlPanel[F],
     statistics: Statistics[F],
     sourceOfMayhem: SourceOfMayhem[F],
     console: NConsole[F],
