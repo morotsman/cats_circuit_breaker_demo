@@ -35,13 +35,11 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
   override def show(): F[Unit] = for {
     sourceOfMayhem <- Ref[F].of(MayhemState.make()).map(SourceOfMayhem.make[F])
     statistics <- Ref[F].of(StatisticsState.make()).map(Statistics.make[F])
-    circuitBreakerDemoState <- Ref[F]
-      .of(CircuitBreakerDemoState.make[F]())
-    circuitBreakerDemoSlide <- MonadError[F, Throwable].pure(CircuitBreakerDemo[F](
+    circuitBreakerDemoSlide <- Ref[F].of(CircuitBreakerDemoState.make[F]()).map(state => CircuitBreakerDemo[F](
       console = console,
       sourceOfMayhem = sourceOfMayhem,
       statistics = statistics,
-      state = circuitBreakerDemoState
+      state = state
     ))
     animator <- Ref[F].of(AnimatorState.make()).flatMap(state =>
       Animator.make[F] (circuitBreakerDemoSlide, statistics, sourceOfMayhem, console, state)
