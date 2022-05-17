@@ -9,7 +9,7 @@ import cats.{Monad, MonadError}
 import cats.effect.{Fiber, Ref, Spawn, Temporal}
 import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsInfo, StatisticsState}
 
-import com.github.morotsman.presentation.slides.demo_slide.animations.Animator
+import com.github.morotsman.presentation.slides.demo_slide.animations.{Animator, AnimatorState}
 
 final case class CircuitBreakerSlideState[F[_]]
 (
@@ -37,13 +37,15 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
     statistics <- Ref[F].of(StatisticsState.make()).map(Statistics.make[F])
     circuitBreakerDemoState <- Ref[F]
       .of(CircuitBreakerDemoState.make[F]())
-    animator <- Animator.make[F](circuitBreakerDemoState, statistics, sourceOfMayhem, console)
     circuitBreakerDemoSlide <- MonadError[F, Throwable].pure(CircuitBreakerDemo[F](
       console = console,
       sourceOfMayhem = sourceOfMayhem,
       statistics = statistics,
       state = circuitBreakerDemoState
     ))
+    animator <- Ref[F].of(AnimatorState.make()).flatMap(state =>
+      Animator.make[F] (circuitBreakerDemoSlide, statistics, sourceOfMayhem, console, state)
+    )
     _ <- state.modify(s => (s.copy(
       slide = Option(circuitBreakerDemoSlide)
     ), s))

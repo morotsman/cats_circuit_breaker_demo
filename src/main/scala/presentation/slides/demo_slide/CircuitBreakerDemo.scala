@@ -19,6 +19,9 @@ case class CircuitBreakerDemo[F[_] : Monad : Temporal : Spawn]
   state: Ref[F, CircuitBreakerDemoState[F]]
 ) extends Slide[F] {
 
+  def getState(): F[CircuitBreakerDemoState[F]] =
+    state.get
+
   override def show(): F[Unit] = {
     for {
       s <- state.get

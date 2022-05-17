@@ -4,7 +4,6 @@ package presentation.slides.demo_slide
 import cats.effect.Fiber
 import presentation.demo.DemoProgram
 import presentation.tools.Input
-import presentation.slides.demo_slide.animations.Animation.AnimationState.{AnimationState, NOT_STARTED}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -39,8 +38,7 @@ final case class CircuitBreakerDemoState[F[_]](
                                                 demoConfiguration: DemoConfiguration,
                                                 isFailing: Boolean,
                                                 isStarted: Boolean,
-                                                circuitBreakerConfiguration: CircuitBreakerConfiguration,
-                                                animationState: AnimationState
+                                                circuitBreakerConfiguration: CircuitBreakerConfiguration
                                               )
 
 object CircuitBreakerDemoState {
@@ -52,6 +50,5 @@ object CircuitBreakerDemoState {
     isFailing = false,
     isStarted = false,
     circuitBreakerConfiguration = CircuitBreakerConfiguration.make(),
-    animationState = NOT_STARTED
   )
 }

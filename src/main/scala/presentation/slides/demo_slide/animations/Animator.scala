@@ -5,12 +5,34 @@ import cats.implicits._
 import cats.Monad
 import cats.effect.{Ref, Temporal}
 import presentation.demo.{CircuitBreakerState, SourceOfMayhem, Statistics}
-import presentation.slides.demo_slide.CircuitBreakerDemoState
-import presentation.slides.demo_slide.animations.Animation.AnimationMapper
-import presentation.slides.demo_slide.animations.Animation.AnimationState.{CLOSED_FAILING, CLOSED_SUCCEED, NOT_STARTED}
+import presentation.slides.demo_slide.{CircuitBreakerDemo, CircuitBreakerDemoState}
 import presentation.tools.NConsole
+import presentation.slides.demo_slide.animations.AnimationState.{AnimationMapper, AnimationState, CLOSED_FAILING, CLOSED_SUCCEED, NOT_STARTED}
+import presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
+import presentation.slides.demo_slide.animations.ClosedSuccess.ClosedSuccessAnimation
+import presentation.slides.demo_slide.animations.Static.staticAnimation
 
 import scala.concurrent.duration.DurationInt
+
+object AnimationState extends Enumeration {
+  type AnimationState = Value
+  val NOT_STARTED, CLOSED_SUCCEED, CLOSED_FAILING = Value
+
+  val AnimationMapper = Map(
+    NOT_STARTED -> staticAnimation,
+    CLOSED_SUCCEED -> ClosedSuccessAnimation,
+    CLOSED_FAILING -> ClosedFailureAnimation
+  )
+}
+
+final case class AnimatorState
+(
+  animationState: AnimationState
+)
+
+object AnimatorState {
+  def make(): AnimatorState = AnimatorState(NOT_STARTED)
+}
 
 trait Animator[F[_]] {
   def animate(): F[Unit]
@@ -20,14 +42,16 @@ object Animator {
 
   def make[F[_] : Monad : Temporal]
   (
-    state: Ref[F, CircuitBreakerDemoState[F]],
+    circuitBreakerDemo: CircuitBreakerDemo[F],
     statistics: Statistics[F],
     sourceOfMayhem: SourceOfMayhem[F],
-    console: NConsole[F]
+    console: NConsole[F],
+    state: Ref[F, AnimatorState]
   ): F[Animator[F]] = Monad[F].pure(new Animator[F] {
     override def animate(): F[Unit] = {
       def animate(frame: Int): F[Unit] = for {
-        s <- state.get
+        animatorState <- state.get
+        s <- circuitBreakerDemo.getState()
         statisticsInfo <- statistics.getStatisticsInfo()
         mayhemState <- sourceOfMayhem.mayhemState()
         animationState = if (
@@ -41,7 +65,7 @@ object Animator {
         } else {
           NOT_STARTED
         }
-        updated <- if (s.animationState != animationState) {
+        updated <- if (animatorState.animationState != animationState) {
           state.modify(s => (s.copy(
             animationState = animationState
           ), s)).map(_ => true)
