@@ -45,7 +45,7 @@ case class ControlPanel[F[_] : Monad : Temporal : Spawn]
       onRejected = MonadError[F, Throwable].unit,
       onHalfOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.HALF_OPEN)
     ).map { circuitBreaker =>
-      DemoProgram[F](
+      DemoProgram.make[F](
         sourceOfMayhem = sourceOfMayhem,
         circuitBreaker = circuitBreaker,
         statistics = statistics
