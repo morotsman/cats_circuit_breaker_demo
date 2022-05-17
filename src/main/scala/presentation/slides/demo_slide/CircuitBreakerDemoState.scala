@@ -5,8 +5,6 @@ import cats.effect.Fiber
 import presentation.demo.DemoProgram
 import presentation.tools.Input
 
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
-
 final case class DemoConfiguration(
                                     delayBetweenCallToSourceOfMayhemInNanos: Int
                                   )
@@ -17,29 +15,16 @@ object DemoConfiguration {
   )
 }
 
-final case class CircuitBreakerConfiguration(
-                                              maxFailures: Int,
-                                              resetTimeout: FiniteDuration,
-                                              maxResetTimeout: FiniteDuration
-                                            )
-
-object CircuitBreakerConfiguration {
-  def make(): CircuitBreakerConfiguration = CircuitBreakerConfiguration(
-    maxFailures = 4,
-    resetTimeout = 3.seconds,
-    maxResetTimeout = 30.seconds
-  )
-}
-
-final case class CircuitBreakerDemoState[F[_]](
-                                                demoProgram: Option[DemoProgram[F]],
-                                                demoProgramExecutor: Option[Fiber[F, Throwable, Unit]],
-                                                previousInput: Option[Input],
-                                                demoConfiguration: DemoConfiguration,
-                                                isFailing: Boolean,
-                                                isStarted: Boolean,
-                                                circuitBreakerConfiguration: CircuitBreakerConfiguration
-                                              )
+final case class CircuitBreakerDemoState[F[_]]
+(
+  demoProgram: Option[DemoProgram[F]],
+  demoProgramExecutor: Option[Fiber[F, Throwable, Unit]],
+  previousInput: Option[Input],
+  demoConfiguration: DemoConfiguration,
+  isFailing: Boolean,
+  isStarted: Boolean,
+  circuitBreakerConfiguration: CircuitBreakerConfiguration
+)
 
 object CircuitBreakerDemoState {
   def make[F[_]](): CircuitBreakerDemoState[F] = CircuitBreakerDemoState[F](
