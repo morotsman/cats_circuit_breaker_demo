@@ -67,9 +67,7 @@ object DemoProgramExecutor {
       result <- Monad[F].pure(new DemoProgramExecutor[F] {
         override def execute(): F[Unit] = for {
           s <- state.get
-          _ <- {
-            Temporal[F].sleep(s.delayBetweenCallToSourceOfMayhemInNanos.nanos)
-          }
+          _ <- Temporal[F].sleep(s.delayBetweenCallToSourceOfMayhemInNanos.nanos)
           _ <- s.demoProgram.traverse(_.run()).start
           _ <- execute()
         } yield ()
