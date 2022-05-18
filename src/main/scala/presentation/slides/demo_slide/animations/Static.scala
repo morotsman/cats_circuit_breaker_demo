@@ -3,7 +3,6 @@ package presentation.slides.demo_slide.animations
 
 import presentation.demo.{MayhemState, StatisticsInfo}
 import presentation.tools.Input
-import presentation.util.Colors.{ANSI_GREEN, ANSI_RESET}
 import presentation.slides.demo_slide.CircuitBreakerConfiguration
 import presentation.slides.demo_slide.animations.AnimationHelper._
 
