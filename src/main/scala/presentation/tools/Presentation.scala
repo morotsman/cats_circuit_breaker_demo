@@ -30,7 +30,7 @@ object PresentationState {
 }
 
 object Presentation {
-  def make[F[_] : Monad : Temporal : Spawn]
+  def make[F[_] : Temporal : Spawn]
   (
     console: NConsole[F],
     state: Ref[F, PresentationState[F]]
@@ -38,8 +38,11 @@ object Presentation {
     new Presentation[F] {
       override def start(): F[Unit] = for {
         _ <- console.clear()
-        state <- state.get
-        _ <- state.slides.head.show()
+        currentState <- state.get
+        f <- currentState.slides.head.show().start
+        _ <- state.modify(s => (s.copy(
+          currentSlide = Option(f)
+        ),s))
       } yield ()
 
       override def nextSlide(): F[Unit] = for {
