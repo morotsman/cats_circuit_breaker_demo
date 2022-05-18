@@ -21,7 +21,7 @@ object CircuitBreakerSlideState {
   )
 }
 
-final case class CircuitBreakerSlide[F[_] : Monad : Temporal]
+final case class CircuitBreakerSlide[F[_] : Temporal]
 (
   console: NConsole[F],
   state: Ref[F, CircuitBreakerSlideState[F]]
