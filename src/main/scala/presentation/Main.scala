@@ -21,16 +21,15 @@ object Main extends IOApp {
           circuitBreakerSlide
         )))
         .flatMap(Presentation.make[IO](console, _))
-      _ <- (
-        presentation.start(),
-        IO(handleInput(console, presentation)).flatten.foreverM
-        ).parTupled
+      _ <- presentation.start()
+      _ <- handleInput(console, presentation)
     } yield ()).map(_ => ExitCode.Success)
   }
 
   def handleInput(c: NConsole[IO], presentation: Presentation[IO]): IO[Input] = for {
     input <- c.read()
     _ <- presentation.userInput(input)
+    _ <- handleInput(c, presentation)
   } yield input
 
 }

@@ -47,7 +47,7 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
       demoProgramExecutor = demoProgramExecutor
     ))
     animator <- Ref[F].of(AnimatorState.make()).flatMap(state =>
-      Animator.make[F] (state, circuitBreakerDemoSlide, statistics, sourceOfMayhem, demoProgramExecutor, console)
+      Animator.make[F](state, circuitBreakerDemoSlide, statistics, sourceOfMayhem, demoProgramExecutor, console)
     )
     _ <- state.modify(s => (s.copy(
       slide = Option(circuitBreakerDemoSlide)
