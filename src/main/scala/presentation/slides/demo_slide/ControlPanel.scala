@@ -24,11 +24,7 @@ case class ControlPanel[F[_] : Temporal : Spawn]
   override def userInput(input: Input): F[Unit] = for {
     _ <- input match {
       case Character(c) if c == 'f' =>
-        sourceOfMayhem.toggleFailure() >> state.modify(s => (s.copy(
-          isFailing = !s.isFailing
-        ), s))
-      case Character(c) if c == 's' =>
-        ???
+        sourceOfMayhem.toggleFailure()
       case Character(c) if c == 'n' =>
         state.modify(s => (s.copy(
           previousInput = Option(input)

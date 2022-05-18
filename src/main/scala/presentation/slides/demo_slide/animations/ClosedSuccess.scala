@@ -14,7 +14,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -41,7 +40,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -58,7 +57,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -85,7 +83,7 @@ object ClosedSuccess {
          |        \_\                                             | |                                         | |                     | |
          |           fail (under threshold)                       | |                                         |_|                     |_|
          |                                                        | |                                         | |                     | |
-         |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+         |                                                        | |                                         | |                     | |
          |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
          |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
          |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -102,7 +100,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -129,7 +126,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -146,7 +143,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -173,7 +169,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -190,7 +186,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -217,7 +212,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -234,7 +229,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -261,7 +255,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -278,7 +272,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -305,7 +298,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -322,7 +315,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -349,7 +341,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -366,7 +358,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -393,7 +384,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -410,7 +401,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -437,7 +427,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -454,7 +444,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -481,7 +470,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -498,7 +487,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -525,7 +513,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -542,7 +530,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -569,7 +556,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -586,7 +573,6 @@ object ClosedSuccess {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -613,7 +599,7 @@ object ClosedSuccess {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___

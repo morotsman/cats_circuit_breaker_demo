@@ -57,11 +57,11 @@ object Animator {
         statisticsInfo <- statistics.getStatisticsInfo()
         mayhemState <- sourceOfMayhem.mayhemState()
         animationState = if (
-          controlPanelState.isStarted && statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !controlPanelState.isFailing
+          statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !mayhemState.isFailing
         ) {
           CLOSED_SUCCEED
         } else if (
-          controlPanelState.isStarted && statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && controlPanelState.isFailing
+          statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && mayhemState.isFailing
         ) {
           CLOSED_FAILING
         } else {
@@ -80,7 +80,6 @@ object Animator {
           animation(frameToShow)(
             statisticsInfo,
             controlPanelState.previousInput,
-            controlPanelState.isStarted,
             mayhemState,
             demoProgramExecutorState.circuitBreakerConfiguration
           )) >>

@@ -18,14 +18,10 @@ object DemoConfiguration {
 final case class ControlPanelState[F[_]]
 (
   previousInput: Option[Input],
-  isFailing: Boolean,
-  isStarted: Boolean,
 )
 
 object ControlPanelState {
   def make[F[_]](): ControlPanelState[F] = ControlPanelState[F](
     previousInput = None,
-    isFailing = false,
-    isStarted = false,
   )
 }

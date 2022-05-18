@@ -13,7 +13,6 @@ object Static {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -40,7 +39,7 @@ object Static {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___

@@ -13,7 +13,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -40,7 +39,7 @@ object ClosedFailure {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -57,7 +56,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -84,7 +82,7 @@ object ClosedFailure {
          |        \_\                                             | |                                         | |                     | |
          |           fail (under threshold)                       | |                                         |_|                     |_|
          |                                                        | |                                         | |                     | |
-         |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+         |                                                        | |                                         | |                     | |
          |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
          |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
          |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -101,7 +99,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -128,7 +125,7 @@ object ClosedFailure {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -145,7 +142,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -172,7 +168,7 @@ object ClosedFailure {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -189,7 +185,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -216,7 +211,7 @@ object ClosedFailure {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -233,7 +228,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -260,7 +254,7 @@ object ClosedFailure {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -277,7 +271,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -304,7 +297,7 @@ object ClosedFailure {
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -321,7 +314,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -341,14 +333,14 @@ object ClosedFailure {
              | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
              | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
              | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
-             |     | |                     | |                        | |
-             |     | | __                  | |                        | |                                         / \                 reset timeout
-             |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
-             |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
+             |     | |                     |1|                        | |
+             |     | | __                  |1|                        | |                                         / \                 reset timeout
+             |     | |/ /__ ___ ___ ___ ___|1|                        | |                                        /| |\                    | |
+             |     |_< <___|___|_1_|_1_|_1_|1|                        | |                                         | |                     | |
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -365,7 +357,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -373,10 +364,10 @@ object ClosedFailure {
         raw"""
              |           __   Success                                                                                   __  call / raise circuit open
              |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
-             |       | < <___|_1_|_1_|_1_|_1_|1|                                                                    | < <___|___|___|___|___| |
-             |       | |\_\                  |1|                                                                    | |\_\                  | |
-             |       | |                     |1|                                                                    | |                     | |
-             |       | |                     |1|                                                                    | |                     | |
+             |       | < <___|___|___|___|___| |                                                                    | < <___|___|___|___|___| |
+             |       | |\_\                  | |                                                                    | |\_\                  | |
+             |       | |                     | |                                                                    | |                     | |
+             |       | |                     | |                                                                    | |                     | |
              |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
              | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
              | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
@@ -385,14 +376,14 @@ object ClosedFailure {
              | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
              | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
              | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
-             |     | |                     | |                        | |
-             |     | | __                  | |                        | |                                         / \                 reset timeout
-             |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
-             |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
+             |     | |                     |1|                        | |
+             |     | | __                  |1|                        | |                                         / \                 reset timeout
+             |     | |/ /__ ___ ___ ___ ___|1|                        | |                                        /| |\                    | |
+             |     |_< <___|_1_|_1_|_1_|_1_|1|                        | |                                         | |                     | |
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -409,7 +400,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -417,10 +407,10 @@ object ClosedFailure {
         raw"""
              |           __   Success                                                                                   __  call / raise circuit open
              |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
-             |       | < <_1_|_1_|_1_|_1_|_1_|1|                                                                    | < <___|___|___|___|___| |
-             |       | |\_\                  |1|                                                                    | |\_\                  | |
-             |       | |                     |1|                                                                    | |                     | |
-             |       | |                     |1|                                                                    | |                     | |
+             |       | < <___|___|___|___|___| |                                                                    | < <___|___|___|___|___| |
+             |       | |\_\                  | |                                                                    | |\_\                  | |
+             |       | |                     | |                                                                    | |                     | |
+             |       | |                     | |                                                                    | |                     | |
              |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
              | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
              | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
@@ -429,14 +419,14 @@ object ClosedFailure {
              | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
              | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
              | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
-             |     | |                     | |                        | |
-             |     | | __                  | |                        | |                                         / \                 reset timeout
-             |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
-             |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
+             |     | |                     |1|                        | |
+             |     | | __                  |1|                        | |                                         / \                 reset timeout
+             |     | |/ /__ ___ ___ ___ ___|1|                        | |                                        /| |\                    | |
+             |     |_< <_1_|_1_|_1_|_1_|_1_|1|                        | |                                         | |                     | |
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -453,7 +443,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -461,10 +450,10 @@ object ClosedFailure {
         raw"""
              |           __   Success                                                                                   __  call / raise circuit open
              |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
-             |       |1< <_1_|_1_|_1_|_1_|_1_|1|                                                                    | < <___|___|___|___|___| |
-             |       | |\_\                  |1|                                                                    | |\_\                  | |
-             |       | |                     |1|                                                                    | |                     | |
-             |       | |                     |1|                                                                    | |                     | |
+             |       | < <___|___|___|___|___| |                                                                    | < <___|___|___|___|___| |
+             |       | |\_\                  | |                                                                    | |\_\                  | |
+             |       | |                     | |                                                                    | |                     | |
+             |       | |                     | |                                                                    | |                     | |
              |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
              | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
              | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
@@ -473,14 +462,14 @@ object ClosedFailure {
              | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
              | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
              | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
-             |     | |                     | |                        | |
-             |     | | __                  | |                        | |                                         / \                 reset timeout
-             |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
-             |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
+             |     | |                     |1|                        | |
+             |     | | __                  |1|                        | |                                         / \                 reset timeout
+             |     | |/ /__ ___ ___ ___ ___|1|                        | |                                        /| |\                    | |
+             |     |_<1<_1_|_1_|_1_|_1_|_1_|1|                        | |                                         | |                     | |
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -497,7 +486,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -505,10 +493,10 @@ object ClosedFailure {
         raw"""
              |           __   Success                                                                                   __  call / raise circuit open
              |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
-             |       |1< <_1_|_1_|_1_|_1_|_1_|1|                                                                    | < <___|___|___|___|___| |
-             |       |1|\_\                  |1|                                                                    | |\_\                  | |
-             |       | |                     |1|                                                                    | |                     | |
-             |       | |                     |1|                                                                    | |                     | |
+             |       | < <___|___|___|___|___| |                                                                    | < <___|___|___|___|___| |
+             |       | |\_\                  | |                                                                    | |\_\                  | |
+             |       | |                     | |                                                                    | |                     | |
+             |       | |                     | |                                                                    | |                     | |
              |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
              | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
              | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
@@ -517,14 +505,14 @@ object ClosedFailure {
              | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
              | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
              | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
-             |     | |                     | |                        | |
-             |     | | __                  | |                        | |                                         / \                 reset timeout
-             |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
-             |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
+             |     | |                     |1|                        | |
+             |     | | __                  |1|                        | |                                         / \                 reset timeout
+             |     | |/ /__ ___ ___ ___ ___|1|                        | |                                        /| |\                    | |
+             |     |1<1<_1_|_1_|_1_|_1_|_1_|1|                        | |                                         | |                     | |
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -541,7 +529,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -549,10 +536,10 @@ object ClosedFailure {
         raw"""
              |           __   Success                                                                                   __  call / raise circuit open
              |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
-             |       |1< <_1_|_1_|_1_|_1_|_1_|1|                                                                    | < <___|___|___|___|___| |
-             |       |1|\_\                  |1|                                                                    | |\_\                  | |
-             |       |1|                     |1|                                                                    | |                     | |
-             |       | |                     |1|                                                                    | |                     | |
+             |       | < <___|___|___|___|___| |                                                                    | < <___|___|___|___|___| |
+             |       | |\_\                  | |                                                                    | |\_\                  | |
+             |       | |                     | |                                                                    | |                     | |
+             |       | |                     | |                                                                    | |                     | |
              |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
              | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
              | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
@@ -561,14 +548,14 @@ object ClosedFailure {
              | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
              | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
              | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
-             |     | |                     | |                        | |
-             |     | | __                  | |                        | |                                         / \                 reset timeout
-             |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
-             |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
+             |     | |                     |1|                        | |
+             |     | | __                  |1|                        | |                                         / \                 reset timeout
+             |     |1|/ /__ ___ ___ ___ ___|1|                        | |                                        /| |\                    | |
+             |     |1<1<_1_|_1_|_1_|_1_|_1_|1|                        | |                                         | |                     | |
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -585,7 +572,6 @@ object ClosedFailure {
     (
       s: StatisticsInfo,
       p: Option[Input],
-      isStarted: Boolean,
       mayhemState: MayhemState,
       circuitBreakerConfiguration: CircuitBreakerConfiguration
     ) =>
@@ -593,10 +579,10 @@ object ClosedFailure {
         raw"""
              |           __   Success                                                                                   __  call / raise circuit open
              |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
-             |       |1< <_1_|_1_|_1_|_1_|_1_|1|                                                                    | < <___|___|___|___|___| |
-             |       |1|\_\                  |1|                                                                    | |\_\                  | |
-             |       |1|                     |1|                                                                    | |                     | |
-             |       |1|                     |1|                                                                    | |                     | |
+             |       | < <___|___|___|___|___| |                                                                    | < <___|___|___|___|___| |
+             |       | |\_\                  | |                                                                    | |\_\                  | |
+             |       | |                     | |                                                                    | |                     | |
+             |       | |                     | |                                                                    | |                     | |
              |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
              | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
              | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
@@ -605,14 +591,57 @@ object ClosedFailure {
              | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
              | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
              | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
-             |     | |                     | |                        | |
-             |     | | __                  | |                        | |                                         / \                 reset timeout
-             |     | |/ /__ ___ ___ ___ ___| |                        | |                                        /| |\                    | |
-             |     |_< <___|___|___|___|___|_|                        | |                                         | |                     | |
+             |     | |                     |1|                        | |
+             |     |1| __                  |1|                        | |                                         / \                 reset timeout
+             |     |1|/ /__ ___ ___ ___ ___|1|                        | |                                        /| |\                    | |
+             |     |1<1<_1_|_1_|_1_|_1_|_1_|1|                        | |                                         | |                     | |
              |        \_\                                             | |                                         | |                     | |
              |           fail (under threshold)                       | |                                         |_|                     |_|
              |                                                        | |                                         | |                     | |
-             |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
+             |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
+             |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
+             |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
+             |  ${timeout(p, 24)}                              | |                           |___|___|___|___|___|___|___|___|___|___|___|___|___|
+             |  ${threshold(p, 26)}                            | |___ ___ ___ ___ ___ ___    |_|   _  _   _   _    ___    ___  ___ ___ _  _    |_|
+             |  ${resetTimeout(p, 29)}                         |_ ___|___|___|___|___|___|   | |  | || | /_\ | |  | __|  / _ \| _ \ __| \| |   | |
+             |  ${maxResetTimeout(p, 32)}                             Success                | |  | __ |/ _ \| |__| _|  | (_) |  _/ _|| .` |   | |
+             |                                                                                      | |  |_||_/_/ \_\____|_|    \___/|_| |___|_|\_|   | |
+             |                                                                                      |_|_ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
+             |                                                                                      |___|___|___|___|___|___|___|___|___|___|___|___|___|
+             |
+             |
+             |""".replaceAll("1", ANSI_GREEN + "*" + ANSI_RESET).stripMargin,
+    (
+      s: StatisticsInfo,
+      p: Option[Input],
+      mayhemState: MayhemState,
+      circuitBreakerConfiguration: CircuitBreakerConfiguration
+    ) =>
+      showRuntimeInfo(s, mayhemState, circuitBreakerConfiguration) +
+        raw"""
+             |           __   Success                                                                                   __  call / raise circuit open
+             |        _ / /__ ___ ___ ___ ___ _                                                                      _ / /__ ___ ___ ___ ___ _
+             |       | < <___|___|___|___|___| |                                                                    | < <___|___|___|___|___| |
+             |       | |\_\                  | |                                                                    | |\_\                  | |
+             |       | |                     | |                                                                    | |                     | |
+             |       | |                     | |                                                                    | |                     | |
+             |  ___ _|_|___ ___ ___ ___ ___ _|_|___ ___           fail (threshold reached)               __    ___ _|_|___ ___ ___ ___ ___ _|_|___ ___
+             | |___|___|___|___|___|___|___|___|___|___|      ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___\ \  |___|___|___|___|___|___|___|___|___|___|
+             | |_|     ___ _    ___  ___ ___ ___     |_|      ___|___|___|___|___|___|___|___|___|___|___ > > |_|         ___  ___ ___ _  _         |_|
+             | | |    / __| |  / _ \/ __| __|   \    | |     __                                          /_/  | |        / _ \| _ \ __| \| |        | |
+             | | |   | (__| |_| (_) \__ \ _|| |) |   | |    / /___ ___ _                                      | |       | (_) |  _/ _|| .` |        | |
+             | | |    \___|____\___/|___/___|___/    | |   < < ___|___| |                                     | |        \___/|_| |___|_|\_|        | |
+             | |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|    \_\       | |                                     |_|_ ___ ___ ___ ___ ___ ___ ___ ___ _|_|
+             | |___|___|___|___|___|___|___|___|___|___|              | |                                     |___|___|___|___|___|___|___|___|___|___|
+             |     |1|                     |1|                        | |
+             |     |1| __                  |1|                        | |                                         / \                 reset timeout
+             |     |1|/ /__ ___ ___ ___ ___|1|                        | |                                        /| |\                    | |
+             |     |1<1<_1_|_1_|_1_|_1_|_1_|1|                        | |                                         | |                     | |
+             |        \_\                                             | |                                         | |                     | |
+             |           fail (under threshold)                       | |                                         |_|                     |_|
+             |                                                        | |                                         | |                     | |
+             |                                                        | |                                         | |                     | |
              |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
              |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
              |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
@@ -626,6 +655,11 @@ object ClosedFailure {
              |
              |
              |""".replaceAll("1", ANSI_GREEN + "*" + ANSI_RESET).stripMargin
+
+
+
+
+
 
 
 
