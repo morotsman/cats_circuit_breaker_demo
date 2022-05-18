@@ -3,54 +3,23 @@ package presentation.slides.demo_slide
 
 import cats._
 import cats.effect._
-import cats.effect.implicits._
 import cats.implicits._
-import presentation.demo.{CircuitBreakerState, DemoProgram, SourceOfMayhem, Statistics}
-import presentation.tools.{Character, Input, NConsole, Slide}
-import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
+import presentation.demo.SourceOfMayhem
+import presentation.tools.{Character, Input, Slide}
 
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
-
-case class ControlPanel[F[_] : Monad : Temporal : Spawn]
+case class ControlPanel[F[_] : Temporal : Spawn]
 (
-  console: NConsole[F],
+  state: Ref[F, ControlPanelState[F]],
   sourceOfMayhem: SourceOfMayhem[F],
-  statistics: Statistics[F],
-  state: Ref[F, ControlPanelState[F]]
+  demoProgramExecutor: DemoProgramExecutor[F]
 ) extends Slide[F] {
 
   def getState(): F[ControlPanelState[F]] =
     state.get
 
   override def show(): F[Unit] = {
-    for {
-      s <- state.get
-      demoProgram <- createDemoProgram(s.circuitBreakerConfiguration)
-      _ <- {
-        state.modify(s => (s.copy(
-          demoProgram = Option(demoProgram)
-        ), s))
-      }
-    } yield ()
+    Monad[F].unit
   }
-
-  private def createDemoProgram(circuitBreakerConfiguration: CircuitBreakerConfiguration): F[DemoProgram[F]] =
-    CircuitBreaker.of[F](
-      maxFailures = circuitBreakerConfiguration.maxFailures,
-      resetTimeout = circuitBreakerConfiguration.resetTimeout,
-      backoff = Backoff.exponential,
-      maxResetTimeout = circuitBreakerConfiguration.maxResetTimeout,
-      onOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.OPEN),
-      onClosed = statistics.circuitBreakerStateChange(CircuitBreakerState.CLOSED),
-      onRejected = MonadError[F, Throwable].unit,
-      onHalfOpen = statistics.circuitBreakerStateChange(CircuitBreakerState.HALF_OPEN)
-    ).map { circuitBreaker =>
-      DemoProgram.make[F](
-        sourceOfMayhem = sourceOfMayhem,
-        circuitBreaker = circuitBreaker,
-        statistics = statistics
-      )
-    }
 
   override def userInput(input: Input): F[Unit] = for {
     _ <- input match {
@@ -59,19 +28,7 @@ case class ControlPanel[F[_] : Monad : Temporal : Spawn]
           isFailing = !s.isFailing
         ), s))
       case Character(c) if c == 's' =>
-        for {
-          s <- state.get
-          _ <- if (s.demoProgramExecutor.isDefined) {
-            s.demoProgramExecutor.traverse(_.cancel) >> state.modify(s => (s.copy(
-              demoProgramExecutor = None,
-              isStarted = false
-            ), s))
-          } else {
-            updateProgramExecutor() >> state.modify(s => (s.copy(
-              isStarted = true
-            ), s))
-          }
-        } yield ()
+        ???
       case Character(c) if c == 'n' =>
         state.modify(s => (s.copy(
           previousInput = Option(input)
@@ -101,41 +58,17 @@ case class ControlPanel[F[_] : Monad : Temporal : Spawn]
           s <- state.get
           _ <- s.previousInput.traverse {
             case Character(c) if c == 'n' =>
-              for {
-                _ <- state.modify(s => (s.copy(
-                  demoConfiguration = s.demoConfiguration.copy(
-                    delayBetweenCallToSourceOfMayhemInNanos =
-                      s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos / 5
-                  )
-                ),
-                  s))
-                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
-              } yield ()
+              demoProgramExecutor.decreaseDelayBetweenCallsToSourceOfMayhem()
             case Character(c) if c == 'l' =>
               sourceOfMayhem.increaseSuccessLatency()
             case Character(c) if c == 't' =>
               sourceOfMayhem.increaseRequestTimeout()
             case Character(c) if c == 'a' =>
-              for {
-                _ <- updateCircuitBreakerConfiguration(_.copy(
-                  maxFailures = s.circuitBreakerConfiguration.maxFailures * 2
-                ))
-                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
-              } yield ()
+              demoProgramExecutor.increaseMaxFailures()
             case Character(c) if c == 'r' =>
-              for {
-                _ <- updateCircuitBreakerConfiguration(_.copy(
-                  resetTimeout = s.circuitBreakerConfiguration.resetTimeout * 2
-                ))
-                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
-              } yield ()
+              demoProgramExecutor.increaseResetTimeout()
             case Character(c) if c == 'm' =>
-              for {
-                _ <- updateCircuitBreakerConfiguration(_.copy(
-                  maxResetTimeout = s.circuitBreakerConfiguration.maxResetTimeout * 2
-                ))
-                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
-              } yield ()
+              demoProgramExecutor.increaseMaxResetTimeout()
             case _ =>
               Monad[F].unit
           }
@@ -145,48 +78,17 @@ case class ControlPanel[F[_] : Monad : Temporal : Spawn]
           s <- state.get
           _ <- s.previousInput.traverse {
             case Character(c) if c == 'n' =>
-              for {
-                _ <- state.modify(s => (s.copy(
-                  demoConfiguration = s.demoConfiguration.copy(
-                    delayBetweenCallToSourceOfMayhemInNanos =
-                      s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos * 5
-                  )
-                ),
-                  s))
-                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
-              } yield ()
+              demoProgramExecutor.increaseDelayBetweenCallsToSourceOfMayhem()
             case Character(c) if c == 'l' =>
               sourceOfMayhem.decreaseSuccessLatency()
             case Character(c) if c == 't' =>
               sourceOfMayhem.decreaseRequestTimeout()
             case Character(c) if c == 'a' =>
-              for {
-                _ <- updateCircuitBreakerConfiguration(_.copy(
-                  maxFailures = {
-                    val max = s.circuitBreakerConfiguration.maxFailures / 2
-                    if (max >= 1) {
-                      max
-                    } else {
-                      1
-                    }
-                  }
-                ))
-                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
-              } yield ()
+              demoProgramExecutor.decreaseMaxFailures()
             case Character(c) if c == 'r' =>
-              for {
-                _ <- updateCircuitBreakerConfiguration(_.copy(
-                  resetTimeout = s.circuitBreakerConfiguration.resetTimeout / 2
-                ))
-                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
-              } yield ()
+              demoProgramExecutor.decreaseResetTimeout()
             case Character(c) if c == 'm' =>
-              for {
-                _ <- updateCircuitBreakerConfiguration(_.copy(
-                  maxResetTimeout = s.circuitBreakerConfiguration.maxResetTimeout / 2
-                ))
-                _ <- if (s.isStarted) updateProgramExecutor() else Monad[F].unit
-              } yield ()
+              demoProgramExecutor.increaseMaxResetTimeout()
             case _ =>
               Monad[F].unit
           }
@@ -197,37 +99,8 @@ case class ControlPanel[F[_] : Monad : Temporal : Spawn]
     }
   } yield true
 
-  private def updateCircuitBreakerConfiguration(modifier: CircuitBreakerConfiguration => CircuitBreakerConfiguration) =
-    for {
-      updatedState <- state.updateAndGet(s => s.copy(
-        circuitBreakerConfiguration = modifier(s.circuitBreakerConfiguration)
-      ))
-      demoProgram <- createDemoProgram(updatedState.circuitBreakerConfiguration)
-      _ <- state.modify(s => (s.copy(
-        demoProgram = Option(demoProgram)
-      ), s))
-    } yield ()
-
-  private def updateProgramExecutor() = {
-    for {
-      s <- state.get
-      _ <- s.demoProgramExecutor.traverse(_.cancel)
-      demoProgramExecutor <- forever(s.demoConfiguration.delayBetweenCallToSourceOfMayhemInNanos.nanos) {
-        s.demoProgram.traverse(_.run()).start
-      }.start
-      _ <- state.modify(s => (s.copy(
-        demoProgramExecutor = Option(demoProgramExecutor)
-      ), s))
-    } yield ()
-  }
-
-  private def forever(delay: FiniteDuration)(effect: => F[_]): F[Unit] =
-    Temporal[F].sleep(delay) >> effect >> forever(delay)(effect)
-
-
   override def exit(): F[Unit] = for {
     s <- state.get
-    _ <- s.demoProgramExecutor.traverse(_.cancel)
   } yield ()
 
 }

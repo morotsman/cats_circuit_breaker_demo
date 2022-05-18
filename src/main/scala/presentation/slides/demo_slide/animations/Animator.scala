@@ -5,7 +5,7 @@ import cats.implicits._
 import cats.Monad
 import cats.effect.{Ref, Temporal}
 import presentation.demo.{CircuitBreakerState, SourceOfMayhem, Statistics}
-import presentation.slides.demo_slide.{ControlPanel, ControlPanelState}
+import presentation.slides.demo_slide.{ControlPanel, DemoProgramExecutor}
 import presentation.tools.NConsole
 import presentation.slides.demo_slide.animations.AnimationState.{AnimationMapper, AnimationState, CLOSED_FAILING, CLOSED_SUCCEED, NOT_STARTED}
 import presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
@@ -40,26 +40,28 @@ trait Animator[F[_]] {
 
 object Animator {
 
-  def make[F[_] : Monad : Temporal]
+  def make[F[_] : Temporal]
   (
-    circuitBreakerDemo: ControlPanel[F],
+    state: Ref[F, AnimatorState],
+    controlPanel: ControlPanel[F],
     statistics: Statistics[F],
     sourceOfMayhem: SourceOfMayhem[F],
-    console: NConsole[F],
-    state: Ref[F, AnimatorState]
+    demoProgramExecutor: DemoProgramExecutor[F],
+    console: NConsole[F]
   ): F[Animator[F]] = Monad[F].pure(new Animator[F] {
     override def animate(): F[Unit] = {
       def animate(frame: Int): F[Unit] = for {
         animatorState <- state.get
-        s <- circuitBreakerDemo.getState()
+        controlPanelState <- controlPanel.getState()
+        demoProgramExecutorState <- demoProgramExecutor.getState()
         statisticsInfo <- statistics.getStatisticsInfo()
         mayhemState <- sourceOfMayhem.mayhemState()
         animationState = if (
-          s.isStarted && statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !s.isFailing
+          controlPanelState.isStarted && statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && !controlPanelState.isFailing
         ) {
           CLOSED_SUCCEED
         } else if (
-          s.isStarted && statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && s.isFailing
+          controlPanelState.isStarted && statisticsInfo.circuitBreakerState == CircuitBreakerState.CLOSED && controlPanelState.isFailing
         ) {
           CLOSED_FAILING
         } else {
@@ -77,10 +79,10 @@ object Animator {
         _ <- console.writeString(
           animation(frameToShow)(
             statisticsInfo,
-            s.previousInput,
-            s.isStarted,
+            controlPanelState.previousInput,
+            controlPanelState.isStarted,
             mayhemState,
-            s.circuitBreakerConfiguration
+            demoProgramExecutorState.circuitBreakerConfiguration
           )) >>
           Temporal[F].sleep(500.milli) >>
           console.clear() >>

@@ -15,13 +15,15 @@ final case class CircuitBreakerSlideState[F[_]]
   slide: Option[ControlPanel[F]],
   animator: Option[Fiber[F, Throwable, Unit]],
   statisticsAggregator: Option[Fiber[F, Throwable, Unit]],
+  demoProgramExecutor: Option[Fiber[F, Throwable, Unit]],
 )
 
 object CircuitBreakerSlideState {
   def make[F[_]](): CircuitBreakerSlideState[F] = CircuitBreakerSlideState[F](
     slide = None,
     animator = None,
-    statisticsAggregator = None
+    statisticsAggregator = None,
+    demoProgramExecutor = None
   )
 }
 
@@ -34,25 +36,31 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
   override def show(): F[Unit] = for {
     sourceOfMayhem <- Ref[F].of(MayhemState.make()).map(SourceOfMayhem.make[F])
     statistics <- Ref[F].of(StatisticsState.make()).map(Statistics.make[F])
-    circuitBreakerDemoSlide <- Ref[F].of(ControlPanelState.make[F]()).map(state => ControlPanel[F](
-      console = console,
+    demoProgramExecutor <- Ref[F].of(DemoProgramExecutorState.make[F]()).flatMap(state => DemoProgramExecutor.make(
+      state = state,
       sourceOfMayhem = sourceOfMayhem,
-      statistics = statistics,
-      state = state
+      statistics = statistics
+    ))
+    circuitBreakerDemoSlide <- Ref[F].of(ControlPanelState.make[F]()).map(state => ControlPanel[F](
+      sourceOfMayhem = sourceOfMayhem,
+      state = state,
+      demoProgramExecutor = demoProgramExecutor
     ))
     animator <- Ref[F].of(AnimatorState.make()).flatMap(state =>
-      Animator.make[F] (circuitBreakerDemoSlide, statistics, sourceOfMayhem, console, state)
+      Animator.make[F] (state, circuitBreakerDemoSlide, statistics, sourceOfMayhem, demoProgramExecutor, console)
     )
     _ <- state.modify(s => (s.copy(
       slide = Option(circuitBreakerDemoSlide)
     ), s))
+    demoProgramExecutor <- demoProgramExecutor.execute().start
     animator <- animator.animate().start
     statisticsAggregator <- statistics.aggregate().start
     _ <- circuitBreakerDemoSlide.show()
     _ <- state.modify(s => (s.copy(
       slide = Option(circuitBreakerDemoSlide),
       animator = Option(animator),
-      statisticsAggregator = Option(statisticsAggregator)
+      statisticsAggregator = Option(statisticsAggregator),
+      demoProgramExecutor = Option(demoProgramExecutor)
     ), s))
   } yield ()
 
@@ -67,5 +75,6 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
     _ <- s.slide.traverse(_.exit())
     _ <- s.animator.traverse(_.cancel)
     _ <- s.statisticsAggregator.traverse(_.cancel)
+    _ <- s.demoProgramExecutor.traverse(_.cancel)
   } yield ()
 }
