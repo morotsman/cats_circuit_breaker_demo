@@ -6,8 +6,6 @@ import presentation.slides.demo_slide.{CircuitBreakerSlide, CircuitBreakerSlideS
 import presentation.slides.{Agenda, Start}
 import presentation.tools.{Input, NConsole, Presentation, PresentationState}
 
-import cats.implicits.catsSyntaxTuple2Parallel
-
 object Main extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
@@ -15,14 +13,15 @@ object Main extends IOApp {
       console <- NConsole.make[IO]()
       circuitBreakerSlide <- Ref[IO].of(CircuitBreakerSlideState.make[IO]()).map(CircuitBreakerSlide[IO](console, _))
       presentation <- Ref[IO]
-        .of(PresentationState.initialState(List(
+        .of(PresentationState.make(List(
           Start[IO](console),
           Agenda[IO](console),
           circuitBreakerSlide
         )))
         .flatMap(Presentation.make[IO](console, _))
-      _ <- presentation.start()
-      _ <- handleInput(console, presentation)
+      _ <- presentation.start().background.use { _ =>
+        handleInput(console, presentation)
+      }
     } yield ()).map(_ => ExitCode.Success)
   }
 

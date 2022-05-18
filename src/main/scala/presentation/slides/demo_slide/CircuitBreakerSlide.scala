@@ -6,28 +6,22 @@ import presentation.tools.{Input, NConsole, Slide}
 import cats.implicits._
 import cats.effect.implicits._
 import cats.Monad
-import cats.effect.{Fiber, Ref, Spawn, Temporal}
+import cats.effect.{Ref, Temporal}
 import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsState}
 import presentation.slides.demo_slide.animations.{Animator, AnimatorState}
 
 final case class CircuitBreakerSlideState[F[_]]
 (
-  slide: Option[ControlPanel[F]],
-  animator: Option[Fiber[F, Throwable, Unit]],
-  statisticsAggregator: Option[Fiber[F, Throwable, Unit]],
-  demoProgramExecutor: Option[Fiber[F, Throwable, Unit]],
+  controlPanel: Option[ControlPanel[F]],
 )
 
 object CircuitBreakerSlideState {
   def make[F[_]](): CircuitBreakerSlideState[F] = CircuitBreakerSlideState[F](
-    slide = None,
-    animator = None,
-    statisticsAggregator = None,
-    demoProgramExecutor = None
+    controlPanel = None,
   )
 }
 
-final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
+final case class CircuitBreakerSlide[F[_] : Monad : Temporal]
 (
   console: NConsole[F],
   state: Ref[F, CircuitBreakerSlideState[F]]
@@ -41,40 +35,31 @@ final case class CircuitBreakerSlide[F[_] : Monad : Temporal : Spawn]
       sourceOfMayhem = sourceOfMayhem,
       statistics = statistics
     ))
-    circuitBreakerDemoSlide <- Ref[F].of(ControlPanelState.make[F]()).map(state => ControlPanel[F](
+    controlPanel <- Ref[F].of(ControlPanelState.make[F]()).map(state => ControlPanel[F](
       sourceOfMayhem = sourceOfMayhem,
       state = state,
       demoProgramExecutor = demoProgramExecutor
     ))
     animator <- Ref[F].of(AnimatorState.make()).flatMap(state =>
-      Animator.make[F](state, circuitBreakerDemoSlide, statistics, sourceOfMayhem, demoProgramExecutor, console)
+      Animator.make[F](state, controlPanel, statistics, sourceOfMayhem, demoProgramExecutor, console)
     )
     _ <- state.modify(s => (s.copy(
-      slide = Option(circuitBreakerDemoSlide)
+      controlPanel = Option(controlPanel)
     ), s))
-    demoProgramExecutor <- demoProgramExecutor.execute().start
-    animator <- animator.animate().start
-    statisticsAggregator <- statistics.aggregate().start
-    _ <- circuitBreakerDemoSlide.show()
-    _ <- state.modify(s => (s.copy(
-      slide = Option(circuitBreakerDemoSlide),
-      animator = Option(animator),
-      statisticsAggregator = Option(statisticsAggregator),
-      demoProgramExecutor = Option(demoProgramExecutor)
-    ), s))
+    _ <- (
+      statistics.aggregate(),
+      demoProgramExecutor.execute(),
+      animator.animate()
+    ).parTupled.background.use { _ =>
+      demoProgramExecutor.execute()
+    }
   } yield ()
 
   override def userInput(input: Input): F[Unit] = for {
     s <- state.get
-    _ <- s.slide.traverse(_.userInput(input))
+    _ <- s.controlPanel.traverse(_.userInput(input))
   } yield ()
 
-
-  override def exit(): F[Unit] = for {
-    s <- state.get
-    _ <- s.slide.traverse(_.exit())
-    _ <- s.animator.traverse(_.cancel)
-    _ <- s.statisticsAggregator.traverse(_.cancel)
-    _ <- s.demoProgramExecutor.traverse(_.cancel)
-  } yield ()
+  override def exit(): F[Unit] =
+    Monad[F].unit
 }

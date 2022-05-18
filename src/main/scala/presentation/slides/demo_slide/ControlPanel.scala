@@ -84,7 +84,7 @@ case class ControlPanel[F[_] : Temporal : Spawn]
             case Character(c) if c == 'r' =>
               demoProgramExecutor.decreaseResetTimeout()
             case Character(c) if c == 'm' =>
-              demoProgramExecutor.increaseMaxResetTimeout()
+              demoProgramExecutor.decreaseMaxResetTimeout()
             case _ =>
               Monad[F].unit
           }
