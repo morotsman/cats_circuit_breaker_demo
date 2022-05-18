@@ -5,7 +5,7 @@ import cats._
 import cats.effect._
 import cats.implicits._
 import presentation.demo.SourceOfMayhem
-import presentation.tools.{Character, Input, Slide}
+import presentation.tools.{Character, Input}
 
 trait ControlPanel[F[_]] {
   def getState(): F[ControlPanelState[F]]
@@ -94,7 +94,7 @@ object ControlPanel {
         case _ =>
           Monad[F].unit
       }
-    } yield true
+    } yield ()
 
   }
 }
