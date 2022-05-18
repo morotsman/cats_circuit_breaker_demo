@@ -35,9 +35,9 @@ final case class CircuitBreakerSlide[F[_] : Temporal]
       sourceOfMayhem = sourceOfMayhem,
       statistics = statistics
     ))
-    controlPanel <- Ref[F].of(ControlPanelState.make[F]()).map(state => ControlPanel[F](
-      sourceOfMayhem = sourceOfMayhem,
+    controlPanel <- Ref[F].of(ControlPanelState.make[F]()).map(state => ControlPanel.make[F](
       state = state,
+      sourceOfMayhem = sourceOfMayhem,
       demoProgramExecutor = demoProgramExecutor
     ))
     animator <- Ref[F].of(AnimatorState.make()).flatMap(state =>
