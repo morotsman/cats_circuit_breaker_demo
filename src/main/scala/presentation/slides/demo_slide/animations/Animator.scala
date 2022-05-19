@@ -5,7 +5,7 @@ import cats.implicits._
 import cats.Monad
 import cats.effect.{Ref, Temporal}
 import presentation.demo.{CircuitBreakerState, SourceOfMayhem, Statistics}
-import presentation.slides.demo_slide.{ControlPanel, DemoProgramExecutor}
+import presentation.slides.demo_slide.DemoProgramExecutor
 import presentation.tools.NConsole
 import presentation.slides.demo_slide.animations.AnimationState.{AnimationMapper, AnimationState, CLOSED_FAILING, CLOSED_SUCCEED, UNKNOWN}
 import presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
@@ -43,7 +43,6 @@ object Animator {
   def make[F[_] : Temporal]
   (
     state: Ref[F, AnimatorState],
-    controlPanel: ControlPanel[F],
     statistics: Statistics[F],
     sourceOfMayhem: SourceOfMayhem[F],
     demoProgramExecutor: DemoProgramExecutor[F],
@@ -52,7 +51,6 @@ object Animator {
     override def animate(): F[Unit] = {
       def animate(frame: Int): F[Unit] = for {
         animatorState <- state.get
-        controlPanelState <- controlPanel.getState()
         demoProgramExecutorState <- demoProgramExecutor.getState()
         statisticsInfo <- statistics.getStatisticsInfo()
         mayhemState <- sourceOfMayhem.mayhemState()
@@ -79,7 +77,7 @@ object Animator {
         _ <- console.writeString(
           animation(frameToShow)(
             statisticsInfo,
-            controlPanelState.previousInput,
+            statisticsInfo.currentInput,
             mayhemState,
             demoProgramExecutorState.circuitBreakerConfiguration
           )) >>
