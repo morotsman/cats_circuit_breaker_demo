@@ -84,12 +84,10 @@ object Presentation {
         _ <- input match {
           case Key(k) if k == SpecialKey.Left =>
             for {
-              _ <- presentationState.slides(presentationState.slideIndex).exit()
               _ <- previousSlide()
             } yield ()
           case Key(k) if k == SpecialKey.Right =>
             for {
-              _ <- presentationState.slides(presentationState.slideIndex).exit()
               _ <- nextSlide()
             } yield ()
           case _ =>

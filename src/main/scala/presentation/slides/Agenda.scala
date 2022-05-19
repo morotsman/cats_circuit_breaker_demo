@@ -42,5 +42,4 @@ case class Agenda[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
 
   override def userInput(input: Input): F[Unit] = Sync[F].unit
 
-  override def exit(): F[Unit] = Sync[F].unit
 }

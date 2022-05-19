@@ -5,7 +5,6 @@ import presentation.tools.{Input, NConsole, Slide}
 
 import cats.implicits._
 import cats.effect.implicits._
-import cats.Monad
 import cats.effect.{Ref, Temporal}
 import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsState}
 import presentation.slides.demo_slide.animations.{Animator, AnimatorState}
@@ -60,6 +59,4 @@ final case class CircuitBreakerSlide[F[_] : Temporal]
     _ <- s.controlPanel.traverse(_.userInput(input))
   } yield ()
 
-  override def exit(): F[Unit] =
-    Monad[F].unit
 }

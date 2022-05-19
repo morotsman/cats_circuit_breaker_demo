@@ -5,6 +5,4 @@ trait Slide[F[_]] {
   def show(): F[Unit]
 
   def userInput(input: Input): F[Unit]
-
-  def exit(): F[Unit]
 }
