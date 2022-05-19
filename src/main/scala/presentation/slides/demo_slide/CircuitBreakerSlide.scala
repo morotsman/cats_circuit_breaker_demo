@@ -22,7 +22,6 @@ final case class CircuitBreakerSlide[F[_] : Temporal]
   override def show(): F[Unit] =
     (
       statistics.aggregate(),
-      demoProgramExecutor.execute(),
       animator.animate()
       )
       .parTupled.background.use { _ =>

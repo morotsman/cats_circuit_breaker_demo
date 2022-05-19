@@ -38,6 +38,7 @@ object Main extends IOApp {
       sourceOfMayhem = sourceOfMayhem,
       demoProgramExecutor = demoProgramExecutor
     ))
+    // TODO gather all info needed for animator in statistics
     animator <- Ref[IO].of(AnimatorState.make()).flatMap(state =>
       Animator.make[IO](state, controlPanel, statistics, sourceOfMayhem, demoProgramExecutor, console)
     )
