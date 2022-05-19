@@ -71,7 +71,7 @@ object Presentation {
 
       private def nextSlide(): F[Unit] = for {
         updatedState <- state.updateAndGet(s =>
-          if (s.slideIndex == s.slides.size - 1) {
+          if (s.slideIndex >= s.slides.size - 1) {
             s
           } else {
             s.copy(slideIndex = s.slideIndex + 1)
