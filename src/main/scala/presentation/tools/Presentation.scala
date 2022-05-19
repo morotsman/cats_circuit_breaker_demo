@@ -32,8 +32,8 @@ object Presentation {
                 _ <- currentWork.cancel
                 _ <- console.clear()
                 index = currentSlideIndex - 1
-                f <- slides(index).show().start
-              } yield (index, f)
+                newWork <- slides(index).show().start
+              } yield (index, newWork)
             } else {
               Monad[F].pure((currentSlideIndex, currentWork))
             }
@@ -43,8 +43,8 @@ object Presentation {
                 _ <- currentWork.cancel
                 _ <- console.clear()
                 index = currentSlideIndex + 1
-                f <- slides(index).show().start
-              } yield (index, f)
+                newWork <- slides(index).show().start
+              } yield (index, newWork)
             } else {
               Monad[F].pure((currentSlideIndex, currentWork))
             }
