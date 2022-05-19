@@ -37,39 +37,14 @@ object Presentation {
         _ <- state.modify(s => (s.copy(
           currentSlide = Option(f)
         ),s))
+        _ <- handleInput()
       } yield ()
 
-      private def nextSlide(): F[Unit] = for {
-        updatedState <- state.updateAndGet(s =>
-          if (s.slideIndex == s.slides.size - 1) {
-            s
-          } else {
-            s.copy(slideIndex = s.slideIndex + 1)
-          }
-        )
-        _ <- updatedState.currentSlide.traverse(_.cancel)
-        _ <- console.clear()
-        f <- updatedState.slides(updatedState.slideIndex).show().start
-        _ <- state.modify(s => (s.copy(
-          currentSlide = Option(f)
-        ),s))
-      } yield ()
-
-      private def previousSlide(): F[Unit] = for {
-        updatedState <- state.updateAndGet(s =>
-          if (s.slideIndex > 0) {
-            s.copy(slideIndex = s.slideIndex - 1)
-          } else {
-            s
-          }
-        )
-        _ <- updatedState.currentSlide.traverse(_.cancel)
-        _ <- console.clear()
-        f <- updatedState.slides(updatedState.slideIndex).show().start
-        _ <- state.modify(s => (s.copy(
-          currentSlide = Option(f)
-        ),s))
-      } yield f
+      def handleInput(): F[Input] = for {
+        input <- console.read()
+        _ <- userInput(input)
+        _ <- handleInput()
+      } yield input
 
       override def userInput(input: Input): F[Unit] = for {
         _ <- input match {
@@ -88,6 +63,38 @@ object Presentation {
               _ <- slide.userInput(input)
             } yield ()
         }
+      } yield ()
+
+      private def previousSlide(): F[Unit] = for {
+        updatedState <- state.updateAndGet(s =>
+          if (s.slideIndex > 0) {
+            s.copy(slideIndex = s.slideIndex - 1)
+          } else {
+            s
+          }
+        )
+        _ <- updatedState.currentSlide.traverse(_.cancel)
+        _ <- console.clear()
+        f <- updatedState.slides(updatedState.slideIndex).show().start
+        _ <- state.modify(s => (s.copy(
+          currentSlide = Option(f)
+        ),s))
+      } yield f
+
+      private def nextSlide(): F[Unit] = for {
+        updatedState <- state.updateAndGet(s =>
+          if (s.slideIndex == s.slides.size - 1) {
+            s
+          } else {
+            s.copy(slideIndex = s.slideIndex + 1)
+          }
+        )
+        _ <- updatedState.currentSlide.traverse(_.cancel)
+        _ <- console.clear()
+        f <- updatedState.slides(updatedState.slideIndex).show().start
+        _ <- state.modify(s => (s.copy(
+          currentSlide = Option(f)
+        ),s))
       } yield ()
 
     }

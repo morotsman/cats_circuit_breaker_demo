@@ -19,9 +19,7 @@ object Main extends IOApp {
           circuitBreakerSlide
         )))
         .flatMap(Presentation.make[IO](console, _))
-      _ <- presentation.start().background.use { _ =>
-        handleInput(console, presentation)
-      }
+      _ <- presentation.start()
     } yield ()).map(_ => ExitCode.Success)
   }
 
