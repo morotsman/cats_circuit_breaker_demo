@@ -22,11 +22,5 @@ object Main extends IOApp {
       _ <- presentation.start()
     } yield ()).map(_ => ExitCode.Success)
   }
-
-  def handleInput(c: NConsole[IO], presentation: Presentation[IO]): IO[Input] = for {
-    input <- c.read()
-    _ <- presentation.userInput(input)
-    _ <- handleInput(c, presentation)
-  } yield input
-
+  
 }
