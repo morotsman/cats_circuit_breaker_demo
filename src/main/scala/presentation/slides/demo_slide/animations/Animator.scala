@@ -7,7 +7,7 @@ import cats.effect.{Ref, Temporal}
 import presentation.demo.{CircuitBreakerState, SourceOfMayhem, Statistics}
 import presentation.slides.demo_slide.{ControlPanel, DemoProgramExecutor}
 import presentation.tools.NConsole
-import presentation.slides.demo_slide.animations.AnimationState.{AnimationMapper, AnimationState, CLOSED_FAILING, CLOSED_SUCCEED, NOT_STARTED}
+import presentation.slides.demo_slide.animations.AnimationState.{AnimationMapper, AnimationState, CLOSED_FAILING, CLOSED_SUCCEED, UNKNOWN}
 import presentation.slides.demo_slide.animations.ClosedFailure.ClosedFailureAnimation
 import presentation.slides.demo_slide.animations.ClosedSuccess.ClosedSuccessAnimation
 import presentation.slides.demo_slide.animations.Static.staticAnimation
@@ -16,10 +16,10 @@ import scala.concurrent.duration.DurationInt
 
 object AnimationState extends Enumeration {
   type AnimationState = Value
-  val NOT_STARTED, CLOSED_SUCCEED, CLOSED_FAILING = Value
+  val UNKNOWN, CLOSED_SUCCEED, CLOSED_FAILING = Value
 
   val AnimationMapper = Map(
-    NOT_STARTED -> staticAnimation,
+    UNKNOWN -> staticAnimation,
     CLOSED_SUCCEED -> ClosedSuccessAnimation,
     CLOSED_FAILING -> ClosedFailureAnimation
   )
@@ -31,7 +31,7 @@ final case class AnimatorState
 )
 
 object AnimatorState {
-  def make(): AnimatorState = AnimatorState(NOT_STARTED)
+  def make(): AnimatorState = AnimatorState(UNKNOWN)
 }
 
 trait Animator[F[_]] {
@@ -65,7 +65,7 @@ object Animator {
         ) {
           CLOSED_FAILING
         } else {
-          NOT_STARTED
+          UNKNOWN
         }
         updated <- if (animatorState.animationState != animationState) {
           state.modify(s => (s.copy(
