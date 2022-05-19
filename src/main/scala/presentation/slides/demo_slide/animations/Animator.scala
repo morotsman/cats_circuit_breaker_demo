@@ -47,7 +47,7 @@ object Animator {
     sourceOfMayhem: SourceOfMayhem[F],
     demoProgramExecutor: DemoProgramExecutor[F],
     console: NConsole[F]
-  ): F[Animator[F]] = Monad[F].pure(new Animator[F] {
+  ): Animator[F] = new Animator[F] {
     override def animate(): F[Unit] = {
       def animate(frame: Int): F[Unit] = for {
         animatorState <- state.get
@@ -88,7 +88,7 @@ object Animator {
 
       animate(0)
     }
-  })
+  }
 }
 
 

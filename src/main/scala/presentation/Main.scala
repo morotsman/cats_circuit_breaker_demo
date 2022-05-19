@@ -39,7 +39,7 @@ object Main extends IOApp {
       demoProgramExecutor
     ))
     // TODO gather all info needed for animator in statistics
-    animator <- Ref[IO].of(AnimatorState.make()).flatMap(
+    animator <- Ref[IO].of(AnimatorState.make()).map(
       Animator.make[IO](_, statistics, sourceOfMayhem, demoProgramExecutor, console)
     )
     circuitBreakerSlide = CircuitBreakerSlide[IO](
