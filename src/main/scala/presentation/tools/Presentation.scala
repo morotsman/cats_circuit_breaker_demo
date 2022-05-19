@@ -9,12 +9,6 @@ import cats.implicits._
 trait Presentation[F[_]] {
   def start(): F[Unit]
 
-  def nextSlide(): F[Unit]
-
-  def previousSlide(): F[Unit]
-
-  def exit(): F[Unit]
-
   def userInput(input: Input): F[Unit]
 }
 
@@ -45,7 +39,7 @@ object Presentation {
         ),s))
       } yield ()
 
-      override def nextSlide(): F[Unit] = for {
+      private def nextSlide(): F[Unit] = for {
         updatedState <- state.updateAndGet(s =>
           if (s.slideIndex == s.slides.size - 1) {
             s
@@ -61,7 +55,7 @@ object Presentation {
         ),s))
       } yield ()
 
-      override def previousSlide(): F[Unit] = for {
+      private def previousSlide(): F[Unit] = for {
         updatedState <- state.updateAndGet(s =>
           if (s.slideIndex > 0) {
             s.copy(slideIndex = s.slideIndex - 1)
@@ -77,10 +71,7 @@ object Presentation {
         ),s))
       } yield f
 
-      override def exit(): F[Unit] = ???
-
       override def userInput(input: Input): F[Unit] = for {
-        presentationState <- state.get
         _ <- input match {
           case Key(k) if k == SpecialKey.Left =>
             for {
