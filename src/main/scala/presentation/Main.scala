@@ -4,7 +4,7 @@ package presentation
 import cats.effect._
 import presentation.slides.demo_slide.{CircuitBreakerSlide, ControlPanel, ControlPanelState, DemoProgramExecutor, DemoProgramExecutorState}
 import presentation.slides.{Agenda, Start}
-import presentation.tools.{NConsole, Presentation, PresentationState}
+import presentation.tools.{NConsole, Presentation}
 import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsState}
 import presentation.slides.demo_slide.animations.{Animator, AnimatorState}
 
@@ -14,13 +14,11 @@ object Main extends IOApp {
     (for {
       console <- NConsole.make[IO]()
       circuitBreakerSlide <- createCircuitBreakerSlide(console)
-      presentation <- Ref[IO]
-        .of(PresentationState.make(List(
-          Start[IO](console),
-          Agenda[IO](console),
-          circuitBreakerSlide
-        )))
-        .flatMap(Presentation.make[IO](console, _))
+      presentation <- Presentation.make[IO](console, List(
+        Start[IO](console),
+        Agenda[IO](console),
+        circuitBreakerSlide
+      ))
       _ <- presentation.start()
     } yield ()).map(_ => ExitCode.Success)
   }
