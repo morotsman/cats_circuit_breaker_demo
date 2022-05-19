@@ -7,6 +7,18 @@ import cats.implicits._
 import presentation.demo.SourceOfMayhem
 import presentation.tools.{Character, Input}
 
+final case class ControlPanelState[F[_]]
+(
+  previousInput: Option[Input],
+)
+
+object ControlPanelState {
+  def make[F[_]](): ControlPanelState[F] = ControlPanelState[F](
+    previousInput = None,
+  )
+}
+
+
 trait ControlPanel[F[_]] {
   def getState(): F[ControlPanelState[F]]
 

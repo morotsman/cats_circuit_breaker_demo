@@ -9,7 +9,21 @@ import presentation.demo.{CircuitBreakerState, DemoProgram, SourceOfMayhem, Stat
 
 import io.chrisdavenport.circuit.{Backoff, CircuitBreaker}
 
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.{DurationLong, FiniteDuration}
+
+final case class CircuitBreakerConfiguration(
+                                              maxFailures: Int,
+                                              resetTimeout: FiniteDuration,
+                                              maxResetTimeout: FiniteDuration
+                                            )
+
+object CircuitBreakerConfiguration {
+  def make(): CircuitBreakerConfiguration = CircuitBreakerConfiguration(
+    maxFailures = 4,
+    resetTimeout = 3.seconds,
+    maxResetTimeout = 30.seconds
+  )
+}
 
 final case class DemoProgramExecutorState[F[_]]
 (
