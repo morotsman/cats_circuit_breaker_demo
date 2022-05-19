@@ -4,7 +4,7 @@ package presentation
 import cats.effect._
 import presentation.slides.demo_slide.{CircuitBreakerSlide, CircuitBreakerSlideState}
 import presentation.slides.{Agenda, Start}
-import presentation.tools.{Input, NConsole, Presentation, PresentationState}
+import presentation.tools.{NConsole, Presentation, PresentationState}
 
 object Main extends IOApp {
 
@@ -22,5 +22,5 @@ object Main extends IOApp {
       _ <- presentation.start()
     } yield ()).map(_ => ExitCode.Success)
   }
-  
+
 }
