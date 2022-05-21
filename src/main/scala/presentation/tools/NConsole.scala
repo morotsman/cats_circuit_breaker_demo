@@ -23,8 +23,6 @@ object SpecialKey extends Enumeration {
 trait NConsole[F[_]] {
   def read(): F[Input]
 
-  def writeCharacter(c: Char): F[Unit]
-
   def writeString(s: String): F[Unit]
 
   def clear(): F[Unit]
@@ -38,7 +36,7 @@ object NConsole {
   def make[F[_] : Sync]()(implicit M: Monad[F]): F[NConsole[F]] = {
     Sync[F].delay(
       new NConsole[F] {
-        override def read(): F[Input] = M.pure {
+        override def read(): F[Input] = Sync[F].blocking {
           var input = reader.read().toChar
           if (input == 27) {
             input = reader.read().toChar
@@ -59,15 +57,12 @@ object NConsole {
           }
         }
 
-        override def writeCharacter(c: Char): F[Unit] = M.pure {
-          println(c)
-        }
-
-        override def writeString(s: String): F[Unit] = M.pure {
+        override def writeString(s: String): F[Unit] = Sync[F].blocking {
           println(s)
+          println(Thread.currentThread().getName)
         }
 
-        override def clear(): F[Unit] = M.pure {
+        override def clear(): F[Unit] = Sync[F].blocking {
           terminal.puts(Capability.clear_screen)
           terminal.flush
         }

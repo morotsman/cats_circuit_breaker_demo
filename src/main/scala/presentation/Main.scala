@@ -8,10 +8,9 @@ import presentation.tools.{NConsole, Presentation}
 import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsState}
 import presentation.slides.demo_slide.animations.{Animator, AnimatorState}
 
-object Main extends IOApp {
+object Main extends IOApp.Simple {
 
-  override def run(args: List[String]): IO[ExitCode] = {
-    (for {
+  override def run(): IO[Unit] = for {
       console <- NConsole.make[IO]()
       circuitBreakerSlide <- createCircuitBreakerSlide(console)
       presentation <- Presentation.make[IO](console, List(
@@ -20,8 +19,7 @@ object Main extends IOApp {
         circuitBreakerSlide
       ))
       _ <- presentation.start()
-    } yield ()).map(_ => ExitCode.Success)
-  }
+    } yield ()
 
   private def createCircuitBreakerSlide(console: NConsole[IO]): IO[CircuitBreakerSlide[IO]] = for {
     sourceOfMayhem <- Ref[IO].of(MayhemState.make()).map(SourceOfMayhem.make[IO])
