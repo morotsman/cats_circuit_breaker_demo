@@ -79,7 +79,8 @@ object Animator {
             statisticsInfo,
             statisticsInfo.currentInput,
             mayhemState,
-            demoProgramExecutorState.circuitBreakerConfiguration
+            demoProgramExecutorState.circuitBreakerConfiguration,
+            demoProgramExecutorState.isStarted
           )) >>
           Temporal[F].sleep(500.milli) >>
           console.clear() >>

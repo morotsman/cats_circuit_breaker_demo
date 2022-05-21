@@ -14,7 +14,8 @@ object ClosedSuccess {
       s: StatisticsInfo,
       p: Option[Input],
       mayhemState: MayhemState,
-      circuitBreakerConfiguration: CircuitBreakerConfiguration
+      circuitBreakerConfiguration: CircuitBreakerConfiguration,
+      isStarted: Boolean
     ) =>
       showRuntimeInfo(s, mayhemState, circuitBreakerConfiguration) +
     raw"""
@@ -39,7 +40,7 @@ object ClosedSuccess {
          |        \_\                                             | |                                         | |                     | |
          |           fail (under threshold)                       | |                                         |_|                     |_|
          |                                                        | |                                         | |                     | |
-         |                                                        | |                                         | |                     | |
+         |  ${startStop(isStarted, 34)}                    | |                                         | |                     | |
          |  ${toggleFailure(mayhemState, 40)}              | |                                         | |                    \|_|/
          |  ${numberOfRequests(p, 33)}                     | |                                        fail                     \ /
          |  ${successLatency(p, 31)}                       | |                            ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___ ___
