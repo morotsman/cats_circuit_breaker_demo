@@ -6,9 +6,8 @@ import cats.FlatMap
 
 
 object DebugHelper {
-  /** Extension methods for an effect of type `F[A]`. */ implicit class DebugHelper[F[_] : FlatMap, A](fa: F[A]) {
-    /** Print to the console the value of the effect
-     * along with the thread it was computed on. */
+   implicit class DebugHelper[F[_] : FlatMap, A](fa: F[A]) {
+
     def debug: F[A] =
       for {
         a <- fa
