@@ -35,7 +35,6 @@ object Main extends IOApp.Simple {
       demoProgramExecutor,
       statistics
     ))
-    // TODO gather all info needed for animator in statistics
     animator <- Ref[IO].of(AnimatorState.make()).map(
       Animator.make[IO](_, statistics, sourceOfMayhem, demoProgramExecutor, console)
     )
