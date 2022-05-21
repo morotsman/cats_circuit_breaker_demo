@@ -36,6 +36,8 @@ object ControlPanel {
     override def getState(): F[ControlPanelState[F]] = state.get
 
     override def userInput(input: Input): F[Unit] = input match {
+      case Character(c) if c == 's' =>
+        demoProgramExecutor.toggleStarted() >> statistics.currentInput(input)
       case Character(c) if c == 'f' =>
         sourceOfMayhem.toggleFailure() >> statistics.currentInput(input)
       case Character(c) if c == 'n' =>

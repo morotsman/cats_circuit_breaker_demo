@@ -30,6 +30,7 @@ final case class DemoProgramExecutorState[F[_]]
   delayBetweenCallToSourceOfMayhemInNanos: Long,
   demoProgram: Option[DemoProgram[F]],
   circuitBreakerConfiguration: CircuitBreakerConfiguration,
+  isStarted: Boolean
 )
 
 object DemoProgramExecutorState {
@@ -38,7 +39,8 @@ object DemoProgramExecutorState {
   def make[F[_]](): DemoProgramExecutorState[F] = DemoProgramExecutorState[F](
     delayBetweenCallToSourceOfMayhemInNanos = oneSecondInNanos,
     demoProgram = None,
-    circuitBreakerConfiguration = CircuitBreakerConfiguration.make()
+    circuitBreakerConfiguration = CircuitBreakerConfiguration.make(),
+    isStarted = false
   )
 }
 
@@ -61,6 +63,8 @@ trait DemoProgramExecutor[F[_]] {
 
   def decreaseMaxResetTimeout(): F[Unit]
 
+  def toggleStarted(): F[Unit]
+
   def getState(): F[DemoProgramExecutorState[F]]
 }
 
@@ -81,8 +85,10 @@ object DemoProgramExecutor {
       result <- Monad[F].pure(new DemoProgramExecutor[F] {
         override def execute(): F[Unit] = for {
           s <- state.get
-          _ <- Temporal[F].sleep(s.delayBetweenCallToSourceOfMayhemInNanos.nanos)
-          _ <- s.demoProgram.traverse(_.run()).start
+          _ <- if (s.isStarted) {
+            Temporal[F].sleep(s.delayBetweenCallToSourceOfMayhemInNanos.nanos) >>
+              s.demoProgram.traverse(_.run()).start
+          } else Temporal[F].sleep(1.seconds)
           _ <- execute()
         } yield ()
 
@@ -142,6 +148,11 @@ object DemoProgramExecutor {
 
         override def getState(): F[DemoProgramExecutorState[F]] =
           state.get
+
+        override def toggleStarted(): F[Unit] =
+          state.modify(s => (s.copy(
+            isStarted = !s.isStarted
+          ),s))
       })
     } yield result
   }
