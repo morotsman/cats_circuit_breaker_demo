@@ -32,7 +32,8 @@ object Main extends IOApp.Simple {
     controlPanel <- Ref[IO].of(ControlPanelState.make[IO]()).map(ControlPanel.make[IO](
       _,
       sourceOfMayhem,
-      demoProgramExecutor
+      demoProgramExecutor,
+      statistics
     ))
     // TODO gather all info needed for animator in statistics
     animator <- Ref[IO].of(AnimatorState.make()).map(

@@ -4,7 +4,7 @@ package presentation.slides.demo_slide
 import cats._
 import cats.effect._
 import cats.implicits._
-import presentation.demo.SourceOfMayhem
+import presentation.demo.{SourceOfMayhem, Statistics}
 import presentation.tools.{Character, Input}
 
 final case class ControlPanelState[F[_]]
@@ -30,38 +30,39 @@ object ControlPanel {
   (
     state: Ref[F, ControlPanelState[F]],
     sourceOfMayhem: SourceOfMayhem[F],
-    demoProgramExecutor: DemoProgramExecutor[F]
+    demoProgramExecutor: DemoProgramExecutor[F],
+    statistics: Statistics[F]
   ): ControlPanel[F] = new ControlPanel[F] {
     override def getState(): F[ControlPanelState[F]] = state.get
 
     override def userInput(input: Input): F[Unit] = for {
       _ <- input match {
         case Character(c) if c == 'f' =>
-          sourceOfMayhem.toggleFailure()
+          sourceOfMayhem.toggleFailure() >> statistics.currentInput(input)
         case Character(c) if c == 'n' =>
           state.modify(s => (s.copy(
             previousInput = Option(input)
-          ), s))
+          ), s)) >> statistics.currentInput(input)
         case Character(c) if c == 'l' =>
           state.modify(s => (s.copy(
             previousInput = Option(input)
-          ), s))
+          ), s)) >> statistics.currentInput(input)
         case Character(c) if c == 't' =>
           state.modify(s => (s.copy(
             previousInput = Option(input)
-          ), s))
+          ), s)) >> statistics.currentInput(input)
         case Character(c) if c == 'a' =>
           state.modify(s => (s.copy(
             previousInput = Option(input)
-          ), s))
+          ), s)) >> statistics.currentInput(input)
         case Character(c) if c == 'r' =>
           state.modify(s => (s.copy(
             previousInput = Option(input)
-          ), s))
+          ), s)) >> statistics.currentInput(input)
         case Character(c) if c == 'm' =>
           state.modify(s => (s.copy(
             previousInput = Option(input)
-          ), s))
+          ), s)) >> statistics.currentInput(input)
         case Character(c) if c == '+' =>
           for {
             s <- state.get
