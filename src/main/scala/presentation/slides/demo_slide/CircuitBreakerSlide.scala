@@ -20,12 +20,9 @@ final case class CircuitBreakerSlide[F[_] : Temporal]
 ) extends Slide[F] {
 
   override def show(): F[Unit] =
-    (
-      statistics.aggregate(),
-      animator.animate()
-      )
+    (demoProgramExecutor.execute(), statistics.aggregate())
       .parTupled.background.use { _ =>
-      demoProgramExecutor.execute()
+      animator.animate()
     }
 
   override def userInput(input: Input): F[Unit] =

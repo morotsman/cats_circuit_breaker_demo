@@ -68,7 +68,7 @@ object Animator {
         updated <- if (animatorState.animationState != animationState) {
           state.modify(s => (s.copy(
             animationState = animationState
-          ), s)).map(_ => true)
+          ), s)).as(true)
         } else {
           Monad[F].pure(false)
         }
