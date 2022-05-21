@@ -2,10 +2,10 @@ package com.github.morotsman
 package presentation.tools
 
 import cats.implicits._
-import cats.{FlatMap}
+import cats.FlatMap
 
 
-object debug {
+object DebugHelper {
   /** Extension methods for an effect of type `F[A]`. */ implicit class DebugHelper[F[_] : FlatMap, A](fa: F[A]) {
     /** Print to the console the value of the effect
      * along with the thread it was computed on. */

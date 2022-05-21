@@ -5,7 +5,7 @@ import cats._
 import cats.effect._
 import cats.effect.implicits._
 import cats.implicits._
-import presentation.tools.debug.DebugHelper
+import presentation.tools.DebugHelper.DebugHelper
 
 trait Presentation[F[_]] {
   def start(): F[Unit]
