@@ -29,6 +29,8 @@ trait NConsole[F[_]] {
 }
 
 object NConsole {
+  @inline def apply[F[_]](implicit instance: NConsole[F]): NConsole[F] = instance
+
   private val terminal = TerminalBuilder.terminal()
   terminal.enterRawMode()
   private val reader = terminal.reader()

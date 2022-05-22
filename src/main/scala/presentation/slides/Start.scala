@@ -4,7 +4,7 @@ package presentation.slides
 import cats.effect.Sync
 import presentation.tools.{Input, NConsole, Slide}
 
-case class Start[F[_] : Sync]()(implicit C : NConsole[F]) extends Slide[F] {
+case class Start[F[_] : Sync : NConsole]() extends Slide[F] {
   override def show(): F[Unit] = {
     val text =
       """
@@ -28,7 +28,7 @@ case class Start[F[_] : Sync]()(implicit C : NConsole[F]) extends Slide[F] {
         |
         |
         |"""
-    C.writeString(text.stripMargin)
+    NConsole[F].writeString(text.stripMargin)
   }
 
   override def userInput(input: Input): F[Unit] = Sync[F].unit
