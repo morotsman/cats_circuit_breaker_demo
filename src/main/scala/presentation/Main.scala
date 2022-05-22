@@ -4,19 +4,16 @@ package presentation
 import cats.effect._
 import presentation.slides.demo_slide.{CircuitBreakerSlide, ControlPanel, ControlPanelState, DemoProgramExecutor, DemoProgramExecutorState}
 import presentation.slides.{Agenda, Start}
-import presentation.tools.{NConsole, Presentation}
+import presentation.tools.Presentation
 import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsState}
 import presentation.slides.demo_slide.animations.{Animator, AnimatorState}
-
-import com.github.morotsman.presentation.tools.NConsoleInstances.IONConsole
-
+import presentation.tools.NConsoleInstances.IONConsole
 
 object Main extends IOApp.Simple {
 
   override def run(): IO[Unit] = for {
-      console <- NConsole.make[IO]()
-      circuitBreakerSlide <- createCircuitBreakerSlide(console)
-      presentation <- Presentation.make[IO](console, List(
+      circuitBreakerSlide <- createCircuitBreakerSlide()
+      presentation <- Presentation.make[IO](List(
         Start[IO],
         Agenda[IO],
         circuitBreakerSlide
@@ -24,7 +21,7 @@ object Main extends IOApp.Simple {
       _ <- presentation.start()
     } yield ()
 
-  private def createCircuitBreakerSlide(console: NConsole[IO]): IO[CircuitBreakerSlide[IO]] = for {
+  private def createCircuitBreakerSlide(): IO[CircuitBreakerSlide[IO]] = for {
     sourceOfMayhem <- Ref[IO].of(MayhemState.make()).map(SourceOfMayhem.make[IO])
     statistics <- Ref[IO].of(StatisticsState.make()).map(Statistics.make[IO])
     demoProgramExecutor <- Ref[IO].of(DemoProgramExecutorState.make[IO]()).flatMap(DemoProgramExecutor.make(
