@@ -12,23 +12,23 @@ trait Presentation[F[_]] {
 }
 
 object Presentation {
-  def make[F[_] : Temporal : Spawn]
-  (slides: List[Slide[F]])(implicit C: NConsole[F]): F[Presentation[F]] = Monad[F].pure(
+  def make[F[_] : Temporal : Spawn: NConsole]
+  (slides: List[Slide[F]]): F[Presentation[F]] = Monad[F].pure(
     new Presentation[F] {
       override def start(): F[Unit] = for {
-        _ <- C.clear()
+        _ <- NConsole[F].clear()
         f <- slides.head.show().start
         _ <- executionLoop(f)
       } yield ()
 
       def executionLoop(currentWork: Fiber[F, Throwable, Unit], currentSlideIndex: Int = 0): F[Unit] = for {
-        input <- C.read()
+        input <- NConsole[F].read()
         (slide, work) <- input match {
           case Key(k) if k == SpecialKey.Left =>
             if (currentSlideIndex > 0) {
               for {
                 _ <- currentWork.cancel
-                _ <- C.clear()
+                _ <- NConsole[F].clear()
                 index = currentSlideIndex - 1
                 newWork <- slides(index).show().start
               } yield (index, newWork)
@@ -39,7 +39,7 @@ object Presentation {
             if (currentSlideIndex < slides.length - 1) {
               for {
                 _ <- currentWork.cancel
-                _ <- C.clear()
+                _ <- NConsole[F].clear()
                 index = currentSlideIndex + 1
                 newWork <- slides(index).show().start
               } yield (index, newWork)

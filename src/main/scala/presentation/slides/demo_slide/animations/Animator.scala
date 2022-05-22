@@ -40,13 +40,13 @@ trait Animator[F[_]] {
 
 object Animator {
 
-  def make[F[_] : Temporal]
+  def make[F[_] : Temporal : NConsole]
   (
     state: Ref[F, AnimatorState],
     statistics: Statistics[F],
     sourceOfMayhem: SourceOfMayhem[F],
     demoProgramExecutor: DemoProgramExecutor[F],
-  )(implicit C: NConsole[F]): Animator[F] = new Animator[F] {
+  ): Animator[F] = new Animator[F] {
     override def animate(): F[Unit] = {
       def animate(frame: Int): F[Unit] = for {
         animatorState <- state.get
@@ -73,7 +73,7 @@ object Animator {
         }
         frameToShow = if (updated) 0 else frame
         animation = AnimationMapper(animationState)
-        _ <- C.writeString(
+        _ <- NConsole[F].writeString(
           animation(frameToShow)(
             statisticsInfo,
             statisticsInfo.currentInput,
@@ -82,7 +82,7 @@ object Animator {
             demoProgramExecutorState.isStarted
           )) >>
           Temporal[F].sleep(500.milli) >>
-          C.clear() >>
+          NConsole[F].clear() >>
           animate(if (frameToShow < animation.size - 1) frameToShow + 1 else 0)
       } yield ()
 

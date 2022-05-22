@@ -35,7 +35,7 @@ object NConsole {
   terminal.enterRawMode()
   private val reader = terminal.reader()
 
-  def make[F[_] : Sync]()(implicit M: Monad[F]): F[NConsole[F]] = {
+  def make[F[_] : Sync](): F[NConsole[F]] = {
     Sync[F].delay(
       new NConsole[F] {
         override def read(): F[Input] = Sync[F].blocking {
