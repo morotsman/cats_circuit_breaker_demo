@@ -2,9 +2,9 @@ package com.github.morotsman
 package presentation.slides
 
 import cats.effect.Sync
-import com.github.morotsman.presentation.tools.{Input, NConsole, Slide}
+import presentation.tools.{Input, NConsole, Slide}
 
-case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
+case class Start[F[_] : Sync]()(implicit C : NConsole[F]) extends Slide[F] {
   override def show(): F[Unit] = {
     val text =
       """
@@ -28,7 +28,7 @@ case class Start[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
         |
         |
         |"""
-    console.writeString(text.stripMargin)
+    C.writeString(text.stripMargin)
   }
 
   override def userInput(input: Input): F[Unit] = Sync[F].unit

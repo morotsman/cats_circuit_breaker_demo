@@ -8,14 +8,17 @@ import presentation.tools.{NConsole, Presentation}
 import presentation.demo.{MayhemState, SourceOfMayhem, Statistics, StatisticsState}
 import presentation.slides.demo_slide.animations.{Animator, AnimatorState}
 
+import com.github.morotsman.presentation.tools.NConsoleInstances.IONConsole
+
+
 object Main extends IOApp.Simple {
 
   override def run(): IO[Unit] = for {
       console <- NConsole.make[IO]()
       circuitBreakerSlide <- createCircuitBreakerSlide(console)
       presentation <- Presentation.make[IO](console, List(
-        Start[IO](console),
-        Agenda[IO](console),
+        Start[IO],
+        Agenda[IO],
         circuitBreakerSlide
       ))
       _ <- presentation.start()
@@ -36,15 +39,14 @@ object Main extends IOApp.Simple {
       statistics
     ))
     animator <- Ref[IO].of(AnimatorState.make()).map(
-      Animator.make[IO](_, statistics, sourceOfMayhem, demoProgramExecutor, console)
+      Animator.make[IO](_, statistics, sourceOfMayhem, demoProgramExecutor)
     )
     circuitBreakerSlide = CircuitBreakerSlide[IO](
       sourceOfMayhem,
       statistics,
       demoProgramExecutor,
       controlPanel,
-      animator,
-      console
+      animator
     )
   } yield circuitBreakerSlide
 }

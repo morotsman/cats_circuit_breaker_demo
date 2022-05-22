@@ -4,9 +4,9 @@ package presentation.slides
 import cats.effect.Sync
 import com.github.morotsman.presentation.tools.{Input, NConsole, Slide}
 
-case class Agenda[F[_] : Sync](console: NConsole[F]) extends Slide[F] {
+case class Agenda[F[_] : Sync]()(implicit C: NConsole[F]) extends Slide[F] {
   override def show(): F[Unit] =
-    console.writeString(
+    C.writeString(
       """
         |                               _
         |     /\                       | |

@@ -46,8 +46,7 @@ object Animator {
     statistics: Statistics[F],
     sourceOfMayhem: SourceOfMayhem[F],
     demoProgramExecutor: DemoProgramExecutor[F],
-    console: NConsole[F]
-  ): Animator[F] = new Animator[F] {
+  )(implicit C: NConsole[F]): Animator[F] = new Animator[F] {
     override def animate(): F[Unit] = {
       def animate(frame: Int): F[Unit] = for {
         animatorState <- state.get
@@ -74,7 +73,7 @@ object Animator {
         }
         frameToShow = if (updated) 0 else frame
         animation = AnimationMapper(animationState)
-        _ <- console.writeString(
+        _ <- C.writeString(
           animation(frameToShow)(
             statisticsInfo,
             statisticsInfo.currentInput,
@@ -83,7 +82,7 @@ object Animator {
             demoProgramExecutorState.isStarted
           )) >>
           Temporal[F].sleep(500.milli) >>
-          console.clear() >>
+          C.clear() >>
           animate(if (frameToShow < animation.size - 1) frameToShow + 1 else 0)
       } yield ()
 

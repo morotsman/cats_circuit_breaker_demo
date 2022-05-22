@@ -4,7 +4,7 @@ package presentation.tools
 import presentation.tools.SpecialKey.SpecialKey
 
 import cats.Monad
-import cats.effect.Sync
+import cats.effect.{IO, Sync}
 import org.jline.terminal.TerminalBuilder
 import org.jline.utils.InfoCmp.Capability
 
@@ -67,5 +67,19 @@ object NConsole {
           terminal.flush
         }
       })
+  }
+}
+
+object NConsoleInstances {
+  implicit val IONConsole: NConsole[IO] = new NConsole[IO] {
+    val console = NConsole.make[IO]()
+
+    override def read(): IO[Input] = console.flatMap(_.read())
+
+    override def writeString(s: String): IO[Unit] =
+      console.flatMap(_.writeString(s))
+
+    override def clear(): IO[Unit] =
+      console.flatMap(_.clear())
   }
 }

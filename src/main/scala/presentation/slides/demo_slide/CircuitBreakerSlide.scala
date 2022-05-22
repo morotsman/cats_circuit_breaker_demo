@@ -15,8 +15,7 @@ final case class CircuitBreakerSlide[F[_] : Temporal]
   statistics: Statistics[F],
   demoProgramExecutor: DemoProgramExecutor[F],
   controlPanel: ControlPanel[F],
-  animator: Animator[F],
-  console: NConsole[F]
+  animator: Animator[F]
 ) extends Slide[F] {
 
   override def show(): F[Unit] =
