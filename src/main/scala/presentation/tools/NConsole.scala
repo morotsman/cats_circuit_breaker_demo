@@ -3,7 +3,6 @@ package presentation.tools
 
 import presentation.tools.SpecialKey.SpecialKey
 
-import cats.Monad
 import cats.effect.{IO, Sync}
 import org.jline.terminal.TerminalBuilder
 import org.jline.utils.InfoCmp.Capability
@@ -66,7 +65,7 @@ object NConsole {
 
         override def clear(): F[Unit] = Sync[F].blocking {
           terminal.puts(Capability.clear_screen)
-          terminal.flush
+          terminal.flush()
         }
       })
   }
@@ -74,7 +73,7 @@ object NConsole {
 
 object NConsoleInstances {
   implicit val IONConsole: NConsole[IO] = new NConsole[IO] {
-    val console = NConsole.make[IO]()
+    private val console = NConsole.make[IO]()
 
     override def read(): IO[Input] = console.flatMap(_.read())
 
